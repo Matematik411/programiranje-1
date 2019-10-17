@@ -10,11 +10,11 @@ import re
 # definiratje URL glavne strani bolhe za oglase z mačkami
 cats_frontpage_url = 'http://www.bolha.com/zivali/male-zivali/macke/'
 # mapa, v katero bomo shranili podatke
-cat_directory = 'podatki'
+cat_directory = 'Data_main'
 # ime datoteke v katero bomo shranili glavno stran
-frontpage_filename = 'glavna.html'
+frontpage_filename = 'Main.html'
 # ime CSV datoteke v katero bomo shranili podatke
-csv_filename = 'podatki.csv'
+csv_filename = 'Data.csv'
 
 
 def download_url_to_string(url):
@@ -77,7 +77,7 @@ def read_file_to_string(directory, filename):
 
 def page_to_ads(page_content):
     """Funkcija poišče posamezne oglase, ki se nahajajo v spletni strani in
-    vrne njih seznam"""
+    vrne njihov seznam"""
     niz = re.compile(
         r'<div class="ad( featured)?">.*?'
         r'</div>\s*</div>\s*</div>',
@@ -100,16 +100,14 @@ def get_dict_from_ad_block(block):
     in opisu ter vrne slovar, ki vsebuje ustrezne podatke
     """
     niz = re.compile(
-        r'">(?P<ime>.*)'
-        r'</a></h3>(?P<opis>.*)\s*<div.*?'
-        #r'<div class="price"><span>(?P<cena>.*)</span>'
+        r'<h3><a title=".*?">(?P<IME>.*)</a></h3>'
+        r'\s*(?P<OPIS>.*?)\s*<div class="additionalInfo">.*?'
+        r'<div class="price">(<span>)?(?P<CENA>.*?)(</span>)?</div>\s*</div>\s*?<div class="clear">',
+        flags=re.DOTALL
     )
-    count = 0
-    for zadetek in re.finditer(niz, block[0]):
-        print(zadetek.groupdict())
-        count += 1
-    print(count)
-#get_dict_from_ad_block(page_to_ads(read_file_to_string("podatki", "glavna.html")))
+    for zadetek in re.finditer(niz, block):
+        return zadetek.groupdict()
+#get_dict_from_ad_block(page_to_ads(read_file_to_string("podatki", "glavna.html"))[3])
 
 
 # Definirajte funkcijo, ki sprejme ime in lokacijo datoteke, ki vsebuje
@@ -120,7 +118,13 @@ def get_dict_from_ad_block(block):
 def ads_from_file(filename, directory):
     """Funkcija prebere podatke v datoteki "directory"/"filename" in jih
     pretvori (razčleni) v pripadajoč seznam slovarjev za vsak oglas posebej."""
-    raise NotImplementedError()
+    stran = read_file_to_string(directory, filename)
+    bloki = page_to_ads(stran)
+    return [
+        get_dict_from_ad_block(blok)
+        for blok
+        in bloki
+    ]
 
 
 ###############################################################################
@@ -135,7 +139,7 @@ def write_csv(fieldnames, rows, directory, filename):
     """
     os.makedirs(directory, exist_ok=True)
     path = os.path.join(directory, filename)
-    with open(path, 'w') as csv_file:
+    with open(path, 'w', encoding="utf-8") as csv_file:
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
         writer.writeheader()
         for row in rows:
@@ -159,31 +163,33 @@ def write_cat_ads_to_csv(ads, directory, filename):
     # Prednost je v tem, da ga lahko pod določenimi pogoji izklopimo v
     # produkcijskem okolju
     assert ads and (all(j.keys() == ads[0].keys() for j in ads))
-    raise NotImplementedError()
-
-
+    kljuci = [key for key in ads[0].keys()]
+    write_csv(kljuci, ads, directory, filename)
+# k = ads_from_file("glavna.html","podatki")
+# write_cat_ads_to_csv(k, "podatki", csv_filename)
 # Celoten program poženemo v glavni funkciji
 
-def main(redownload=True, reparse=True):
+def main():
     """Funkcija izvede celoten del pridobivanja podatkov:
     1. Oglase prenese iz bolhe
     2. Lokalno html datoteko pretvori v lepšo predstavitev podatkov
     3. Podatke shrani v csv datoteko
     """
     # Najprej v lokalno datoteko shranimo glavno stran
-
+    save_frontpage(cats_frontpage_url, cat_directory, frontpage_filename)
     # Iz lokalne (html) datoteke preberemo podatke
-
+    # nepotrebno
     # Podatke prebermo v lepšo obliko (seznam slovarjev)
-
+    podatki = ads_from_file(frontpage_filename, cat_directory)
     # Podatke shranimo v csv datoteko
-
+    write_cat_ads_to_csv(podatki, cat_directory, csv_filename)
     # Dodatno: S pomočjo parameteov funkcije main omogoči nadzor, ali se
     # celotna spletna stran ob vsakem zagon prense (četudi že obstaja)
     # in enako za pretvorbo
+    # FUNKCIJA VSE NAREDI ŠE ENKRAT
 
-    raise NotImplementedError()
+    
 
 
-# if __name__ == '__main__':
-#     main()
+if __name__ == '__main__':
+    main()
