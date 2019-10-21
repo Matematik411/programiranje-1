@@ -101,14 +101,16 @@ def get_dict_from_ad_block(block):
     """
     niz = re.compile(
         r'<h3><a title=".*?">(?P<IME>.*)</a></h3>'
-        r'\s*(?P<OPIS>.*?)\s*<div class="additionalInfo">.*?'
+        r'\s*(?P<OPIS>.*?)\s*<div class="additionalInfo">'
+        r'.*?'
         r'<div class="price">(<span>)?(?P<CENA>.*?)(</span>)?</div>\s*</div>\s*?<div class="clear">',
         flags=re.DOTALL
     )
     for zadetek in re.finditer(niz, block):
         return zadetek.groupdict()
 #get_dict_from_ad_block(page_to_ads(read_file_to_string("podatki", "glavna.html"))[3])
-
+# ŠE ZA RODOVNIK
+# .*<a title="(?P<naslov>.*?)" .*</a></h3>\s*(?P<opis>.*?)\s*<div class="additionalInfo"><span><b>(?P<rodovnik>.*?)</b>.*<div class="price"><span>(?P<cena>.*?)</span>
 
 # Definirajte funkcijo, ki sprejme ime in lokacijo datoteke, ki vsebuje
 # besedilo spletne strani, in vrne seznam slovarjev, ki vsebujejo podatke o
