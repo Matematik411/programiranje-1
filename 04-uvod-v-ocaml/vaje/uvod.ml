@@ -8,7 +8,9 @@
  - : int = 4
 [*----------------------------------------------------------------------------*)
 
-let rec square = ()
+let square a = a * a
+
+let result = square 2
 
 (*----------------------------------------------------------------------------*]
  Funkcija [middle_of_triple] vrne srednji element trojice.
@@ -17,7 +19,11 @@ let rec square = ()
  - : bool = false
 [*----------------------------------------------------------------------------*)
 
-let rec middle_of_triple = ()
+let rec middle_of_triple (a, b, c) = b
+
+let srednji trojica = 
+  let (x, y, z) = trojica in
+  y
 
 (*----------------------------------------------------------------------------*]
  Funkcija [starting_element] vrne prvi element danega seznama. V primeru
@@ -27,7 +33,14 @@ let rec middle_of_triple = ()
  - : int = 1
 [*----------------------------------------------------------------------------*)
 
-let rec starting_element = ()
+let rec starting_element seznam =
+  match seznam with
+  | [] -> failwith "seznam je prazen"
+  | x :: xs -> x
+
+let prvi = function
+  | [] -> failwith "prazen seznam"
+  | x :: xs -> x 
 
 (*----------------------------------------------------------------------------*]
  Funkcija [multiply] zmnoži vse elemente seznama. V primeru praznega seznama
@@ -37,7 +50,9 @@ let rec starting_element = ()
  - : int = 48
 [*----------------------------------------------------------------------------*)
 
-let rec multiply = ()
+let rec multiply = function
+  | [] -> 1
+  | x :: xs -> x * (multiply xs)
 
 (*----------------------------------------------------------------------------*]
  Napišite funkcijo ekvivalentno python kodi:
@@ -54,8 +69,9 @@ let rec multiply = ()
  - : int list = [-1; 7; 0]
 [*----------------------------------------------------------------------------*)
 
-let rec sum_int_pairs = ()
-
+let rec sum_int_pairs = function
+  | [] -> []
+  | (x, y) :: rest -> (x + y) :: sum_int_pairs rest
 (*----------------------------------------------------------------------------*]
  Funkcija [get k list] poišče [k]-ti element v seznamu [list]. Številčenje
  elementov seznama (kot ponavadi) pričnemo z 0. Če je k negativen, funkcija
@@ -65,8 +81,14 @@ let rec sum_int_pairs = ()
  - : int = 1
 [*----------------------------------------------------------------------------*)
 
-let rec get = ()
+let rec get k = function
+  | [] -> failwith "prekratek seznam"
+  | x :: xs -> if k <= 0 then x else get (k - 1) xs
 
+let rec dobi k = function
+  | [] -> failwith "prekratek seznam"
+  | x :: xs when k <= 0 -> x
+  | x :: xs -> dobi (k - 1) xs
 (*----------------------------------------------------------------------------*]
  Funkcija [double] podvoji pojavitve elementov v seznamu.
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -74,7 +96,9 @@ let rec get = ()
  - : int list = [1; 1; 2; 2; 3; 3]
 [*----------------------------------------------------------------------------*)
 
-let rec double = ()
+let rec double = function
+  | [] -> []
+  | x :: xs -> [x; x] @ double xs
 
 (*----------------------------------------------------------------------------*]
  Funkcija [insert x k list] na [k]-to mesto seznama [list] vrine element [x].
@@ -86,7 +110,9 @@ let rec double = ()
  - : int list = [1; 0; 0; 0; 0; 0]
 [*----------------------------------------------------------------------------*)
 
-let rec insert = ()
+let rec insert x k = function
+  | [] -> [x]
+  | y :: rest -> if k <= 0 then x :: y :: rest else y :: insert x (k - 1) rest
 
 (*----------------------------------------------------------------------------*]
  Funkcija [divide k list] seznam razdeli na dva seznama. Prvi vsebuje prvih [k]
@@ -99,7 +125,10 @@ let rec insert = ()
  - : int list * int list = ([1; 2; 3; 4; 5], [])
 [*----------------------------------------------------------------------------*)
 
-let rec divide = ()
+let rec divide k = function
+  | [] -> ([], [])
+  | x :: rest -> if k <= 0 then ([], x :: rest) 
+                 else let sez1, sez2 = divide (k - 1) rest in (x :: sez1, sez2)
 
 (*----------------------------------------------------------------------------*]
  Funkcija [rotate n list] seznam zavrti za [n] mest v levo. Predpostavimo, da
@@ -109,7 +138,10 @@ let rec divide = ()
  - : int list = [3; 4; 5; 1; 2]
 [*----------------------------------------------------------------------------*)
 
-let rec rotate = ()
+let rec rotate n = function
+  | [] -> []
+  | x :: xs when n = 0 -> x :: xs
+  | x :: xs -> rotate (n - 1) xs @ [x]
 
 (*----------------------------------------------------------------------------*]
  Funkcija [remove x list] iz seznama izbriše vse pojavitve elementa [x].
@@ -118,7 +150,10 @@ let rec rotate = ()
  - : int list = [2; 3; 2; 3]
 [*----------------------------------------------------------------------------*)
 
-let rec remove = ()
+let rec remove x = function
+  | [] -> []
+  | y :: rest when y = x -> remove x rest
+  | y :: rest -> y :: remove x rest
 
 (*----------------------------------------------------------------------------*]
  Funkcija [is_palindrome] za dani seznam ugotovi ali predstavlja palindrom.
@@ -130,7 +165,11 @@ let rec remove = ()
  - : bool = false
 [*----------------------------------------------------------------------------*)
 
-let rec is_palindrome = ()
+let rec dolzina = function
+  | [] -> 0
+  | x :: xs -> 1 + dolzina xs
+
+let is_palindrome sez = (sez = rotate (dolzina sez) sez)
 
 (*----------------------------------------------------------------------------*]
  Funkcija [max_on_components] sprejme dva seznama in vrne nov seznam, katerega
@@ -141,8 +180,11 @@ let rec is_palindrome = ()
  - : int list = [5; 4; 3; 3; 4]
 [*----------------------------------------------------------------------------*)
 
-let rec max_on_components = ()
-
+let rec max_on_components sez1 sez2 =  
+  match (sez1, sez2) with
+  | ([], _) | (_, []) -> []
+  | (x :: xs, y :: ys) when x >= y -> x :: max_on_components xs ys
+  | (x :: xs, y :: ys) -> y :: max_on_components xs ys
 (*----------------------------------------------------------------------------*]
  Funkcija [second_largest] vrne drugo največjo vrednost v seznamu. Pri tem se
  ponovitve elementa štejejo kot ena vrednost. Predpostavimo, da ima seznam vsaj
@@ -153,4 +195,12 @@ let rec max_on_components = ()
  - : int = 10
 [*----------------------------------------------------------------------------*)
 
-let rec second_largest = ()
+let rec second_largest seznam = 
+  let rec largest = function
+    | [] -> failwith "prekratek seznam"
+    | x :: [] -> x
+    | x :: xs when x > largest xs -> x
+    | x :: xs -> largest xs
+
+  in 
+  largest (remove (largest seznam) seznam)
