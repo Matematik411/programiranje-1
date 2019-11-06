@@ -12,29 +12,37 @@ type race = Orc | Hobbit | Human
 *)
 
 
-type school = ()
+type school = Fire | Necrotic | Angelic
 
 
-type spell = ()
+type spell = Firewall | Blaze | Resurrect | Cripple | Renounce | Banish
 
 (* Veščine [skills], ki jih je čarodej osvojil, so seznam vseh urokov,
    ki jih lahko hitro izvede. Definiraj tip `skills'. *)
 
-
+type skills = spell list
 
 (* Čarodeja opišemo z imenom, številom življenskih točk [hp], sposobnost [ability]
    ki jo predstavimo s številom točk mane, raso [race] in veščino [skills].
    To shranimo kot zapisni tip (record). *)
 
-type mana = int
-type health = int
+type mana = Mana of int
+type health = Hp of int
 
-type wizard = {name : string; }
+type wizard = {
+  name : string; 
+  hp : health;
+  ability : mana;
+  race : race;
+  skills : skills
+  }
 
 
 (* Napiši funkcijo ki vsakemu uroku priredi primerno šolo magije. *)
 let school_of_spell = function
-  () -> ()
+  | Firewall | Blaze -> Fire
+  | Resurrect | Cripple -> Necrotic
+  | Banish | Renounce -> Angelic
 
 (* Glede na tabelo napiši funkcijo, ki uroku priredi količino mane,
    ki jo čarodej potrebuje za izvršitev uroka:
@@ -47,7 +55,13 @@ let school_of_spell = function
 
    Namig: Lahko si pomagaš z regex-replace v Notepad++
  *)
-let mana_of_spell = failwith "todo"
+let mana_of_spell = function
+  | blaze -> Mana 420
+  | firewall -> Mana 35
+  | renounce -> Mana 17
+  | banish -> Mana 103
+  | resurrect -> Mana 178
+  | cripple -> Mana 250
 
 (* Ustvari nekaj primerov čarodejov, tako kot je prikazano na primeru Merlina.
    Ponovno si lahko pomagaš s regex-replace.*)
@@ -60,11 +74,11 @@ name : "Snoop Dogg", ability : 420,  hp : 4000,  skills : [Blaze],              
 *)
 
 (* let merlin = {name = "Merlin";   ability = 1832; hp = 9001; skills = [Renounce; Banish];  race = Human} *)
-let frodo =  failwith "todo"
-let ajitam = failwith "todo"
-let mrDuck = failwith "todo"
-let kYloReN = failwith "todo"
-let snoop_dogg = failwith "todo"
+let frodo = {name = "Frodo"; ability = Mana 53; hp = Hp 1000; skills = [Renounce]; race = Hobbit}
+let ajitam = {name = "Ajitam"; ability = Mana 1337; hp = Hp 7331; skills = [Firewall; Resurrect]; race = Hobbit}
+let mrDuck = {name = "Mr Duck"; ability = Mana 7; hp = Hp 90000; skills = [Cripple]; race = Orc}
+let kyloRen = {name = "Kylo Ren"; ability = Mana 589; hp = Hp 90; skills = [Resurrect]; race = Human}
+let snoop_dogg = {name = "Snoop Dogg"; ability = Mana 420; hp = Hp 4000; skills = [Blaze]; race = Orc}
 
 
 (* Napiši funkcijo, ki iz seznama čarodejev vrne čarodeja z največ mane. *)

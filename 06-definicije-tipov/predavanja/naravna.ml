@@ -29,3 +29,17 @@ let pretvori_v_int n = zlozi succ 0 n
 let sestej' m n = zlozi (fun vsota -> Naslednik vsota) m n
 let zmnozi' m n = zlozi (fun produkt -> sestej' produkt m) Nic n
 let potenciraj' m n = zlozi (fun potenca -> zmnozi' potenca m) ena n
+
+let naravno_v_int n = 
+  let rec naravno_v_int' acc = function
+    | Nic -> acc
+    | Naslednik n' -> naravno_v_int' (acc + 1) (n')
+  in
+  naravno_v_int' 0 n
+
+let int_v_naravno n = 
+  let rec int_v_naravno' acc = function
+    | 0 -> acc
+    | n' -> int_v_naravno' (Naslednik acc) (n' - 1)
+  in
+  int_v_naravno' Nic n
