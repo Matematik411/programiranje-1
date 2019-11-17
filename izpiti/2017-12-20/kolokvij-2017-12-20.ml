@@ -45,6 +45,7 @@ let rec uporabi_veckrat f n x =
    - seznam (gozd) dreves tipa /'a drevo/. *)
 type 'a drevo = Roza of 'a * 'a drevo list
 
+
 (* 2.2) Definirajte naslednja rožna drevesa:
 
    t = 1,  t' =  2   ,      t'' =  3
