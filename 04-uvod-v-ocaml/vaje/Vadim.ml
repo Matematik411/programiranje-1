@@ -147,3 +147,22 @@ let phi_improved n =
     in
     phi_improved' 1 (factors_pairs n)
 
+
+(* -------------- FOLD LEFT & RIGHT --------------------------*)
+let rec rfold f list z = match list with (*ta ni repno rek, ker začne zadaj*)
+  | [] -> z
+  | x :: xs -> f x (rfold f xs z)
+
+let rfold_tr f list z =
+  let reversed = List.rev list
+  in
+  let rec aux f value = function
+    | [] -> value
+    | x :: xs -> aux f (f x value) xs
+  in
+  aux f z reversed
+
+let rec lfold f z = function
+  | [] -> z
+  | x :: xs -> lfold f (f z x) xs
+

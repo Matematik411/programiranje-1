@@ -85,10 +85,13 @@ let vsa_pozitivna drevo =
 
 let rec sirina_drevesa (Roza(_, gozd)) = 
   let rec sirina' acc = function
-    | Roza (_, []) -> max acc 1
+    | Roza (_, []) -> max acc 0
     | Roza (_, x :: xs) -> sirina' (max (sirina' 0 x) (acc + 1)) (Roza (0, xs))
   in 
   sirina' 0 (Roza(0, gozd))
+
+let rec fold_sirina (Roza(_, gozd)) = 
+  List.map fold_sirina gozd |> List.fold_left max (List.length gozd) 
 
 (* 2.6) Definirajte funkcijo, ki sestavi (poljubno) rožno drevo globine n.
    Vrednosti v korenih so poljubne. *)

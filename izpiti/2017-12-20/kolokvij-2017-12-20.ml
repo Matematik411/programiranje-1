@@ -84,6 +84,8 @@ let rec globina (Roza(_, gozd)) =
   in 
   globina' 0 (Roza(0, gozd))
   
+let rec fold_globina (Roza (_, gozd)) = 
+  List.map (fold_globina) gozd |> List.fold_left max 0 |> (+) 1 
 
 (* 2.6) Definirajte funkcijo, ki sestavi (poljubno) rožno drevo globine n.
    Vrednosti v korenih so poljubne. *)
