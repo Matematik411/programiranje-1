@@ -42,5 +42,6 @@
             "osx": {
                 "command": "ocaml -init \"${file}\""
             }
+        }
     ]
 }
