@@ -119,3 +119,17 @@ let drevo_v_seznam drevo =
       | (Roza (a, x :: xs), _) -> drevo_v_seznam' (x, (stakni xs rest)) (a :: seznam)
   in
   drevo_v_seznam' (drevo, []) []
+
+let drevo_v_seznam_OG t =
+  let rec aux (acc : 'a list) (stack : 'a drevo list list) =
+    (* Poglej če imamo še kakšen gozd za obdelavo.*)
+    match stack with
+    | [] -> acc
+    | ts :: stack ->
+      (* Poglej ali je v gozdu še kakšno drevo.*)
+      (match ts with
+       | [] -> aux acc stack
+       | (Rose (root, forest)) :: ts ->
+         (* Dodaj koren v akumulator in gozd v stack. *)
+          aux (root :: acc) (forest :: ts :: stack))
+ in aux [] [[t]] |> List.rev

@@ -109,4 +109,20 @@ let uredi_po_blokih list =
   let bloki = naredi_bloke list 
   in
   uredi_posebna (primerjaj_bloke) bloki
+
+let boarding_blocks_OG lst =
+  let seq = boarding_sequence lst in
+  let rec aux blocks block stat = function
+    | [] -> block :: blocks
+    | f :: fs ->
+      if stat = f.status then
+         aux blocks (f::block) stat fs
+      else
+         aux (block :: blocks) [f] f.status fs
+  in
+  match seq with
+  | [] -> [[]]
+  | f :: fs ->
+    let blocks = aux [] [f] f.status fs in
+    List.rev blocks
   

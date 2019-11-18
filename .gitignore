@@ -1,4 +1,5 @@
 02-zajem-podatkov/predavanja/zajeti-podatki
+.vscode/tasks.json
 
 *.pyc
 .ipynb_checkpoints
