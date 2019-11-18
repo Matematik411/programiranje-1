@@ -1,0 +1,100 @@
+1. obrni [x] = [x]
+-------------------
+gre direkt
+
+2. dolzina (xs @ ys) = dolzina xs + dolzina ys
+-----------------------------------------------
+z indukcijo na xs
+
+najprej xs = []
+
+dolzina ([] @ ys) = (1)
+= dolzina ys = (0 enota za +)
+= 0 + dolzina ys = (5)
+= dolzina [] + dolzina ys
+
+zdaj IP velja za xs, naj x poljuben
+
+dolzina ((x :: xs) @ ys) = (2)
+= dolzina (x :: (xs @ ys)) = (6)
+= 1 + dolzina (xs @ ys) = (IP)
+= 1 + dolzina xs + dolzina ys = (asociativnost & 6)
+= dolzina (x :: xs) + dolzina ys
+QED
+
+
+3. xs @ [] xs
+-------------
+z indukcijo na xs
+
+baza :
+[] @ [] = [] (po 1)
+
+IP da velja za xs
+
+(x :: xs) @ [] = (2)
+= x :: (xs @ []) = (IP)
+= x :: xs
+QED
+
+4. xs @ (ys @ zs) = (xs @ ys) @ zs
+-----------------------------------
+z indukcijo na xs
+
+baza:
+[] @ (ys @ zs) = (1)
+= ys @ zs = (1)
+= ([] @ ys) @ zs
+
+IP za xs, naj x poljuben
+
+(x :: xs) @ (ys @ zs) = (2)
+= x :: (xs @ (ys @ zs)) = (IP)
+= x :: ((xs @ ys) @ zs) = (2)
+= (x :: (xs @ ys)) @ zs = (2)
+= ((x :: xs) @ ys) @ zs
+QED
+
+5. obrni (xs @ ys) = obrni ys @ obrni xs
+----------------------------------------
+z indukcijo na xs
+
+baza:
+obrni ([] @ ys) = (1)
+= obrni ys = (trditev 3)
+= obrni ys @ [] = (3)
+= obrni ys @ obrni []
+
+IP za poljuben xs
+
+obrni ((x :: xs) @ ys) = (2)
+= obrni (x :: (xs @ ys)) = (4)
+= obrni (xs @ ys) @ [x] = (IP)
+= (obrni ys @ obrni xs) @ [x] = (trditev 4)
+= obrni ys @ (obrni xs @ [x]) = (4)
+= obrni ys @ obrni (x :: xs)
+QED
+
+6. dolzina (obrni xs) = dolzina xs
+----------------------------------
+indukcija po xs
+
+baza: 
+dolzina (obrni []) = (3)
+= dolzina [] = (5) 
+= 0 = (5)
+= dolzina []
+
+IP za poljuben xs
+
+dolzina (obrni (x :: xs)) = (4)
+= dolzina (obrni xs @ [x]) = (trditev 2)
+= dolzina (obrni xs) + dolzina [x] = (IP)
+= dolzina xs + dolzina [x] = (definicija)
+= dolzina xs + dolzina (x :: []) = (6)
+= dolzina xs + 1 + dolzina [] = (5)
+= dolzina xs + 1 = (komutativnost +)
+= 1 + dolzina xs = (6)
+= dolzina (x :: xs)
+QED
+
