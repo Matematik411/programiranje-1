@@ -120,7 +120,7 @@ let drevo_v_seznam drevo =
   in
   drevo_v_seznam' (drevo, []) []
 
-let drevo_v_seznam_OG t =
+(* let drevo_v_seznam_OG t =
   let rec aux (acc : 'a list) (stack : 'a drevo list list) =
     (* Poglej če imamo še kakšen gozd za obdelavo.*)
     match stack with
@@ -132,4 +132,4 @@ let drevo_v_seznam_OG t =
        | (Rose (root, forest)) :: ts ->
          (* Dodaj koren v akumulator in gozd v stack. *)
           aux (root :: acc) (forest :: ts :: stack))
- in aux [] [[t]] |> List.rev
+ in aux [] [[t]] |> List.rev *)

@@ -121,7 +121,7 @@ let zlozi f acc drevo =
   in
   zlozi' (drevo, []) acc
 
-let zlozi_OG (f : 'a -> 'b -> 'a) (b : 'a) (t : 'b drevo) =
+(* let zlozi_OG (f : 'a -> 'b -> 'a) (b : 'a) (t : 'b drevo) =
   let rec aux (acc : 'a) (rests : 'b drevo list list) =
     match rests with
     (* Preveri ali moramo obdelati še kakšen gozd. *)
@@ -133,4 +133,4 @@ let zlozi_OG (f : 'a -> 'b -> 'a) (b : 'a) (t : 'b drevo) =
        | (Rose (root, forest)) :: ts ->
          (* Zloži preko elementa in dodaj nov gozd na rests.*)
          aux (f acc root) (forest :: ts :: rests))
-  in aux b [[t]]
+  in aux b [[t]] *)
