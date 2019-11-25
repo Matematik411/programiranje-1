@@ -35,13 +35,14 @@
             },
             "windows": {
                 "command": "ocaml -init \\\"${file}\\\""
-                },
+            },
             "linux": {
                 "command": "ocaml -init \"${file}\""
             },
             "osx": {
                 "command": "ocaml -init \"${file}\""
-            }
+            },
+            "problemMatcher": []
         },
         {
             "label": "OCaml_laptop_4.08",
