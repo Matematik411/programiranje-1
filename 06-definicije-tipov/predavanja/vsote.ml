@@ -26,7 +26,7 @@ let povrsina obj =
 
 type leto = Leto of int
 
-let delno_definirana_povrsina (Krog r) = 3.14 *. r *. r
+(* let delno_definirana_povrsina (Krog r) = 3.14 *. r *. r *)
 
 let koliko_let_je_minilo (Leto x) = 2019 - x
 
@@ -40,9 +40,9 @@ let pretvori_v_metre (Cevelj x) = Meter (0.3048 *. x)
 let cas_v_sekundah (Meter razdalja) (Meter hitrost_na_sekundo) = razdalja /. hitrost_na_sekundo
 let cas_potovanja = cas_v_sekundah razdalja_do_marsa (pretvori_v_metre hitrost_plovila_na_sekundo)
 
-let nevarna_glava (x :: _) = x
+(* let nevarna_glava (x :: _) = x
 
-let velika_glava xs = nevarna_glava xs > 100
+let velika_glava xs = nevarna_glava xs > 100 *)
 
 let glava sez =
   match sez with
