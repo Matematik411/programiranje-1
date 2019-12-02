@@ -48,14 +48,17 @@
  pridobivamo naravno število iz celega števila.
 [*----------------------------------------------------------------------------*)
 
-module type NAT = sig
+module type NAT = sig 
   type t
 
   val eq   : t -> t -> bool
   val zero : t
-  (* Dodajte manjkajoče! *)
-  (* val to_int : t -> int *)
-  (* val of_int : int -> t *)
+  val one : t
+  val add : t -> t -> t
+  val substract : t -> t -> t
+  val multiply : t -> t -> t
+  val to_int : t -> int 
+  val of_int : int -> t
 end
 
 (*----------------------------------------------------------------------------*]
@@ -68,12 +71,16 @@ end
 [*----------------------------------------------------------------------------*)
 
 module Nat_int : NAT = struct
-
   type t = int
-  let eq x y = failwith "later"
+  
+  let eq x y = (x = y)
   let zero = 0
-  (* Dodajte manjkajoče! *)
-
+  let one = 1
+  let add x y = x + y
+  let substract x y = if x > y then x - y else 0
+  let multiply x y = x * y
+  let to_int x = x 
+  let of_int x = x
 end
 
 (*----------------------------------------------------------------------------*]
@@ -90,12 +97,34 @@ end
 
 module Nat_peano : NAT = struct
 
-  type t = unit (* To morate spremeniti! *)
-  let eq x y = failwith "later"
-  let zero = () (* To morate spremeniti! *)
-  (* Dodajte manjkajoče! *)
-
+  type t = 
+    | Z
+    | S of t 
+  let eq x y = (x = y)
+  let zero = Z 
+  let one = S Z
+  let rec add x = function
+    | Z -> x
+    | S a -> S (add x a)
+  let rec substract x y = 
+    match (x, y) with
+    | (Z, _) -> Z
+    | (S a, Z) -> S a
+    | (S a, S b) -> substract a b
+  let rec multiply x = function
+    | Z -> Z
+    | S a -> add x (multiply x a)
+  let rec to_int = function
+    | Z -> 0
+    | S a -> 1 + (to_int a)
+  let rec of_int = function
+    | 0 -> Z
+    | x -> S (of_int (x-1))
 end
+let sedem = Nat_peano.of_int 7
+let osem = Nat_peano.of_int 8
+let test = Nat_peano.multiply sedem osem
+let ali_je_56 = Nat_peano.to_int test
 
 (*----------------------------------------------------------------------------*]
  V OCamlu lahko module podajamo kot argumente funkcij, z uporabo besede
@@ -118,7 +147,14 @@ end
  - : int = 4950
 [*----------------------------------------------------------------------------*)
 
-let sum_nat_100 (module Nat : NAT) = ()
+let sum_nat_100 (module Nat : NAT) = 
+  let nr = 99
+  in
+  let rec add' = function
+    | 0 -> Nat.of_int 0
+    | x -> Nat.add (add' (x-1)) (Nat.of_int x)
+  in
+  add' nr |> Nat.to_int
 
 (*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*]
  Now we follow the fable told by John Reynolds in the introduction.
@@ -133,6 +169,13 @@ let sum_nat_100 (module Nat : NAT) = ()
 module type COMPLEX = sig
   type t
   val eq : t -> t -> bool
+  val zero : t
+  val one : t
+  val im_one : t
+  val negate : t -> t
+  val conjugate : t -> t
+  val add : t -> t -> t
+  val multiply : t -> t -> t
   (* Dodajte manjkajoče! *)
 end
 
@@ -145,7 +188,15 @@ module Cartesian : COMPLEX = struct
 
   type t = {re : float; im : float}
 
-  let eq x y = failwith "later"
+  let eq x y = x = y
+  let zero = {re = 0.; im = 0.}
+  let one = {re = 1.; im = 0.}
+  let im_one = {re = 0.; im = 1.}
+  let negate {re = a; im = b} = {re = -.a; im = -.b}
+  let conjugate {re = a; im = b} = {re = a; im = -.b}
+  let add z w = {re = (z.re +. w.re); im = (z.im +. w.im)}
+  let multiply z w = {re = (z.re *. w.re) -. (z.im *. w.im); im = (z.im +. w.re) +. (z.re +. w.im)}
+  
   (* Dodajte manjkajoče! *)
 
 end
@@ -162,14 +213,27 @@ module Polar : COMPLEX = struct
 
   type t = {magn : float; arg : float}
 
+
   (* Pomožne funkcije za lažje življenje. *)
   let pi = 2. *. acos 0.
   let rad_of_deg deg = (deg /. 180.) *. pi
   let deg_of_rad rad = (rad /. pi) *. 180.
 
-  let eq x y = failwith "later"
-  (* Dodajte manjkajoče! *)
+  let rec convert arg = 
+    if arg < 0. then convert (arg +. (2. *. pi))
+    else
+    if arg > (2. *. pi) then convert (arg -. (2. *. pi))
+    else
+    arg
 
+  let eq x y = (x.magn = 0. && y.magn = 0.) || x = y
+  let zero = {magn = 0.; arg = 0.}
+  let one = {magn = 1.; arg = 0.}
+  let im_one = {magn = 1.; arg = pi}
+  let negate {magn = a; arg = b} = {magn = a; arg = convert (b +. pi)}
+  let conjugate {magn = a; arg = b} = {magn = a; arg = convert (-.b)}
+  let multiply z w = {magn = (z.magn *. w.magn); arg = convert (z.arg +. w.arg)} 
+  let add z w = w(* + *)
 end
 
 (*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*]
@@ -197,5 +261,5 @@ end
  n : 2
  - : unit = ()
 [*----------------------------------------------------------------------------*)
-
-let count (module Dict : DICT) list = ()
+;;
+(* let count (module Dict : DICT) list = () *)
