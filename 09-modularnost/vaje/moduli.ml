@@ -151,8 +151,15 @@ let sum_nat_100 (module Nat : NAT) =
   let nr = 99
   in
   let rec add' = function
-    | 0 -> Nat.of_int 0
-    | x -> Nat.add (add' (x-1)) (Nat.of_int x)
+    | 0 -> Nat.zero
+    | x -> Nat.add 
+        (add' 
+            (Nat.to_int 
+                (Nat.substract 
+                    (Nat.of_int x) 
+                    Nat.one))
+        )
+        (Nat.of_int x)
   in
   add' nr |> Nat.to_int
 
@@ -216,24 +223,54 @@ module Polar : COMPLEX = struct
 
   (* Pomožne funkcije za lažje življenje. *)
   let pi = 2. *. acos 0.
-  let rad_of_deg deg = (deg /. 180.) *. pi
-  let deg_of_rad rad = (rad /. pi) *. 180.
+  let rad deg = (deg /. 180.) *. pi
+  let deg rad = (rad /. pi) *. 180.
 
-  let rec convert arg = 
-    if arg < 0. then convert (arg +. (2. *. pi))
-    else
-    if arg > (2. *. pi) then convert (arg -. (2. *. pi))
-    else
-    arg
+  let eq x y =
+    x.magn = y.magn &&
+      (x.magn = 0. ||
+      (mod_float x.arg 2. *. pi =
+       mod_float y.arg 2. *. pi))
 
-  let eq x y = (x.magn = 0. && y.magn = 0.) || x = y
   let zero = {magn = 0.; arg = 0.}
   let one = {magn = 1.; arg = 0.}
   let im_one = {magn = 1.; arg = pi}
-  let negate {magn = a; arg = b} = {magn = a; arg = convert (b +. pi)}
-  let conjugate {magn = a; arg = b} = {magn = a; arg = convert (-.b)}
-  let multiply z w = {magn = (z.magn *. w.magn); arg = convert (z.arg +. w.arg)} 
-  let add z w = w(* + *)
+
+  let negate {magn; arg} = {magn; arg = mod_float (arg +. pi) 2.*.pi}
+  let conjugate {magn; arg} = {magn; arg = mod_float (-.arg) 2.*.pi}
+
+  let multiply z w = {magn = (z.magn *. w.magn); arg = mod_float (z.arg +. w.arg) 2.*.pi} 
+  (* SHOUT OUT to the mvp who actually wrote all of this down! #Respect *)
+  (* All of this for addition... *)
+  let re {magn; arg} = magn *. cos (rad arg)
+  let im {magn; arg} = magn *. sin (rad arg)
+
+  let arg re im =
+    let rad =
+      if re > 0. then atan (im /. re)
+      else if re < 0. && im >= 0. then atan (im /. re) +. pi
+      else if re < 0. && im < 0. then  atan (im /. re) -. pi
+      else if re = 0. && im > 0. then pi /. 2.
+      else if re = 0. && im < 0. then -.(pi /. 2.)
+      else 0.
+    in deg rad
+
+  let magn re im = sqrt (re *. re +. im *. im)
+
+  let add x y =
+    let square x = x *. x in
+    let magn = sqrt (square x.magn +. square y.magn +. 2. *. x.magn *. y.magn *. cos (y.arg -. x.arg))
+    and arg = x.arg +.
+                atan2 (y.magn *. sin (y.arg -. x.arg))
+                      (x.magn +. y.magn *. cos (y.arg -. x.arg)) in
+    {magn; arg}
+
+  let add' x y =
+    let z_re, z_im = re x +. re y, im x +. im y in
+    let arg = arg z_re z_im
+    and magn = magn z_re z_im
+    in {arg; magn}
+    (* THANK YOU, kind sir! *)
 end
 
 (*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*]
@@ -249,7 +286,12 @@ end
  Modul naj vsebuje prazen slovar [empty] in pa funkcije [get], [insert] in
  [print] (print naj ponovno deluje zgolj na [(string, int) t].
 [*----------------------------------------------------------------------------*)
-
+module type DICT = sig
+  type ('key, 'value) t
+  
+  val empty : ('key, 'value) t
+  val get : 'key -> ('key, 'value) t -> 'value option
+  val insert : 'key -> ('key, 'value) t -> ('key, 'value) t
 
 (*----------------------------------------------------------------------------*]
  Funkcija [count (module Dict) list] prešteje in izpiše pojavitve posameznih

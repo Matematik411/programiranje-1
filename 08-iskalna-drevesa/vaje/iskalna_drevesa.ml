@@ -26,6 +26,7 @@ let test_tree = Node (
   Node (leaf 6, 7, leaf 11)
 )
 
+
 (*----------------------------------------------------------------------------*]
  Funkcija [mirror] vrne prezrcaljeno drevo. Na primeru [test_tree] torej vrne
           5
@@ -163,7 +164,22 @@ let rec insert a = function
       if a < x then Node (insert a l, x, r)
       else
       Node (l, x, insert a r)
-(*----------------------------------------------------------------------------*]
+
+(* let stopaj f x =
+  let zacetek = Sys.time () in
+  let y = f x in
+  let konec = Sys.time () in
+  print_endline ("Porabljen čas: " ^ string_of_float (1000. *. (konec -. zacetek)) ^ "ms");
+  y
+
+let veliko = 
+  let rec gradi acc = function
+    | x when x < 10000000 -> gradi (Node (acc, x, acc)) (x + 1)
+    | x -> acc
+  in gradi Empty 0 *)
+
+
+  (*----------------------------------------------------------------------------*]
  Funkcija [member2] ne privzame, da je drevo bst.
  
  Opomba: Premislte kolikšna je časovna zahtevnost funkcije [member] in kolikšna
@@ -243,7 +259,7 @@ let rec delete_pred a tree =
 
  S pomočjo BST lahko (zadovoljivo) učinkovito definiramo slovarje. V praksi se
  slovarje definira s pomočjo hash tabel, ki so še učinkovitejše. V nadaljevanju
- pa predpostavimo, da so naši slovarji [dict] binarna iskalna drevesa, ki v
+ pa predpostavimo, da so naši slovarji [dict] binarna iskalna drevesa,ki v
  vsakem vozlišču hranijo tako ključ kot tudi pripadajočo vrednost, in imajo BST
  strukturo glede na ključe. Ker slovar potrebuje parameter za tip ključa in tip
  vrednosti, ga parametriziramo kot [('key, 'value) dict].
@@ -274,7 +290,11 @@ let test_dict = Node (
  # dict_get "c" test_dict;;
  - : int option = Some (-2)
 [*----------------------------------------------------------------------------*)
-
+let rec dict_get key = function
+  | Empty -> None
+  | Node (l, (k, v), r) when key < k -> dict_get key l
+  | Node (l, (k, v), r) when key > k -> dict_get key r
+  | Node (l, (k, v), r)-> Some v
       
 (*----------------------------------------------------------------------------*]
  Funkcija [print_dict] sprejme slovar s ključi tipa [string] in vrednostmi tipa
@@ -291,7 +311,12 @@ let test_dict = Node (
  d : 2
  - : unit = ()
 [*----------------------------------------------------------------------------*)
-
+let rec print_dict = function
+  | Empty -> ()
+  | Node (l, (k, v), r) -> 
+      (print_dict l);
+      print_string (k ^ " " ^ (string_of_int v) ^ "\n");
+      (print_dict r) 
 
 (*----------------------------------------------------------------------------*]
  Funkcija [dict_insert key value dict] v slovar [dict] pod ključ [key] vstavi
@@ -311,4 +336,8 @@ let test_dict = Node (
  d : 2
  - : unit = ()
 [*----------------------------------------------------------------------------*)
-
+let rec dict_insert key value = function
+  | Empty -> Node (Empty, (key, value), Empty)
+  | Node (l, (k, v), r) when key < k -> Node (dict_insert key value l, (k, v), r)
+  | Node (l, (k, v), r) when key > k -> Node (l, (k, v), dict_insert key value r)
+  | Node (l, (k, v), r) -> Node (l, (key, value), r)
