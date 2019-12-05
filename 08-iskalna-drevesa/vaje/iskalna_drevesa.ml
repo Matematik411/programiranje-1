@@ -315,7 +315,7 @@ let rec print_dict = function
   | Empty -> ()
   | Node (l, (k, v), r) -> 
       (print_dict l);
-      print_string (k ^ " " ^ (string_of_int v) ^ "\n");
+      print_string (k ^ " : " ^ (string_of_int v) ^ "\n");
       (print_dict r) 
 
 (*----------------------------------------------------------------------------*]

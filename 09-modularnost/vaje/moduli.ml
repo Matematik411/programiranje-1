@@ -240,7 +240,7 @@ module Polar : COMPLEX = struct
   let conjugate {magn; arg} = {magn; arg = mod_float (-.arg) 2.*.pi}
 
   let multiply z w = {magn = (z.magn *. w.magn); arg = mod_float (z.arg +. w.arg) 2.*.pi} 
-  (* SHOUT OUT to the mvp who actually wrote all of this down! #Respect *)
+  (* SHOUT-OUT to the MVP who actually wrote all of this down! #Respect !!! *)
   (* All of this for addition... *)
   let re {magn; arg} = magn *. cos (rad arg)
   let im {magn; arg} = magn *. sin (rad arg)
@@ -291,17 +291,55 @@ module type DICT = sig
   
   val empty : ('key, 'value) t
   val get : 'key -> ('key, 'value) t -> 'value option
-  val insert : 'key -> ('key, 'value) t -> ('key, 'value) t
+  val insert : 'key -> 'value -> ('key, 'value) t -> ('key, 'value) t
+  val print : (string, int) t -> unit
+end
 
+module Dict_tree : DICT = struct
+  type ('key, 'value) t = 
+    | Empty
+    | Node of ('key, 'value) t * ('key *  'value) * ('key, 'value) t
+
+  let empty = Empty
+
+  let rec get key = function
+    | Empty -> None
+    | Node (l, (k, v), r) when key < k -> get key l
+    | Node (l, (k, v), r) when key > k -> get key r
+    | Node (l, (k, v), r)-> Some v
+  
+  let rec print = function
+    | Empty -> ()
+    | Node (l, (k, v), r) -> 
+        (print l);
+        print_string (k ^ " : " ^ (string_of_int v) ^ "\n");
+        (print r) 
+  
+  let rec insert key value = function
+    | Empty -> Node (Empty, (key, value), Empty)
+    | Node (l, (k, v), r) when key < k -> Node (insert key value l, (k, v), r)
+    | Node (l, (k, v), r) when key > k -> Node (l, (k, v), insert key value r)
+    | Node (l, (k, v), r) -> Node (l, (key, value), r)
+
+end
 (*----------------------------------------------------------------------------*]
  Funkcija [count (module Dict) list] prešteje in izpiše pojavitve posameznih
  elementov v seznamu [list] s pomočjo izbranega modula slovarjev.
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- # count (module Tree_dict) ["b"; "a"; "n"; "a"; "n"; "a"];;
+ # count ["b"; "a"; "n"; "a"; "n"; "a"];;
  a : 3
  b : 1
  n : 2
  - : unit = ()
 [*----------------------------------------------------------------------------*)
-;;
-(* let count (module Dict : DICT) list = () *)
+module D = Dict_tree
+
+let count list =
+  let rec create_object acc = function
+    | [] -> acc
+    | x :: xs ->
+      match D.get x acc with
+        | None -> create_object (D.insert x 1 acc) xs
+        | Some a -> create_object (D.insert x (a + 1) acc) xs
+  in
+  list |> create_object D.empty |> D.print
