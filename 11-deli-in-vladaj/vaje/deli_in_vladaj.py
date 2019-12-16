@@ -202,14 +202,24 @@ print(target)
 # [2, 3, 4, 5, 10, 11, 15, 17, 18]
 ###############################################################################
 def mergesort(a):
-    if len(a) <= 1:
+    d = len(a)
+    if d <= 1:
         return a
     else:
         #zgradi polovici
-        prvi = a[:len(a) // 2]
-        drugi = a[len(a) // 2:]
+        prvi = a[:d // 2]
+        drugi = a[d // 2:]
         prvi = mergesort(prvi)
         drugi = mergesort(drugi)
-        zlij(a, 0, len(a), prvi, drugi)
+        zlij(a, 0, d, prvi, drugi)
         return a
 
+def test_mergesort():
+    for _ in range(1000):
+        a = [random.randint(-100000, 100000) for _ in range(100)]
+        b1 = a[:]
+        b2 = a[:]
+        mergesort(b1)
+        b2.sort()
+        if b1 != b2:
+            return  f"Ne dela na {a}"
