@@ -165,17 +165,23 @@ def test_quicksort():
 #     [1,1,2,3,3,4,5,5,6,7,7,10]
 #
 ###############################################################################
-def zlij(target, begin, end, list_1, list_2):
+def zlij(target, begin, end, list_1, list_2): #MORDA POPRAVI UČINKOVITOST, KER TA SPREMINJA SEZNAME
     for i in range(begin, end):
+
         if list_1 == []:
             target[i] = list_2[0]
             del list_2[0]
+
         elif list_2 == []:
             target[i] = list_1[0]
             del list_1[0]
+
+
         elif list_1[0] < list_2[0]:
             target[i] = list_1[0]
             del list_1[0]
+
+
         else:
             target[i] = list_2[0]
             del list_2[0]
