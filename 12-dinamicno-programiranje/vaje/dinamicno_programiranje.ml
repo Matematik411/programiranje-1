@@ -21,7 +21,70 @@ let test_matrix =
      [| 2 ; 4 ; 5 |];
      [| 7 ; 0 ; 1 |] |]
 
+(* sestavili bomo matriko, koliko sirov lahko max poberemo od tega polja naprej *)
 
+let max_cheese cheese_matrix =
+  let height = Array.length cheese_matrix in
+  let width = 
+    if height = 0 then failwith "matrix has no elements"
+    else 
+    Array.length cheese_matrix.(0) in
+  let sum_matrix = Array.make_matrix height width 0
+  in
+  (* malo drugače *)
+  let eat i j = 
+    let cheese = cheese_matrix.(i).(j) in
+    if i < (height - 1) then
+      if j < (width - 1) then
+        cheese + (max sum_matrix.(i).(j+1) sum_matrix.(i+1).(j))
+      else
+        cheese + sum_matrix.(i+1).(j)
+    else
+      if j < (width - 1) then
+        cheese + sum_matrix.(i).(j+1)
+      else
+        cheese
+  (* še ena možnost *)
+  in
+  let eat2 i j =
+    let cheese = cheese_matrix.(i).(j) in
+    let max_right = if j < (width - 1) then sum_matrix.(i).(j+1) else 0 in
+    let max_down = if i < (height - 1) then sum_matrix.(i+1).(j) else 0 in 
+    cheese + max max_down max_right
+
+
+
+  in
+  let rec loop i j = 
+    let cheese = eat i j in
+    let () = sum_matrix.(i).(j) <- cheese in
+    if j > 0 then
+      loop i (j - 1)
+    else
+      (* nova vrstica *)
+      if i > 0 then
+        loop (i - 1) (width - 1)
+      else
+        ()
+  in
+  let () = loop (height - 1) (width - 1) in
+  sum_matrix.(0).(0)
+
+  (* let eat i j =
+    match (i, j) with
+    | ((heigth - 1), (width - 1)) -> sum_matrix.(i).(j) <- cheese_matrix.(i).(j)
+    | ((heigth - 1), j) -> sum_matrix.(i).(j) <- cheese_matrix.(i).(j) + sum_matrix.(i).(j+1)
+    | (i, (width - 1)) -> sum_matrix.(i).(j) <- cheese_matrix.(i).(j) + sum_matrix.(i+1).(j)
+    | (i, j)-> sum_matrix.(i).(j) <- cheese_matrix.(i).(j) + (max sum_matrix.(i).(j+1) sum_matrix.(i+1).(j))
+
+  in
+  for i = (height - 1) downto 0 do 
+    for j = (width - 1) downto 0 do (eat i j) done
+  done *)
+
+    
+
+  
 
 (*----------------------------------------------------------------------------*]
  Rešujemo problem sestavljanja alternirajoče obarvanih stolpov. Imamo štiri
@@ -38,7 +101,47 @@ let test_matrix =
  # alternating_towers 10;;
  - : int = 35
 [*----------------------------------------------------------------------------*)
+type color =
+  | Red
+  | Blue
 
+let alternating_towers n = 
+(* shema dinamičnega programiranja *)
+(* Establish bounds *)
+(* Make memory *)
+(* Calculate one value by using recursion with memory *)
+(* Loop over all values in the correct order *)
+(* Return result *)
+(* The end *)
+  let red_towers = Array.make (n+1) 0 in
+  let blue_towers = Array.make (n+1) 0 in
+
+  let towers m color = 
+    if m = 0 then 0 else
+    match color with
+      | Red when m <= 2 -> 1
+      | Red -> blue_towers.(m-1) + blue_towers.(m-2)
+      | Blue when m = 1 -> 0
+      | Blue when m <= 2 -> 1
+      | Blue when m = 3 -> 2
+      | Blue -> red_towers.(m-2) + red_towers.(m-3)
+
+  in
+  let rec loop i = 
+
+    let nr_red = towers i Red in
+    let nr_blue = towers i Blue in
+    let () = red_towers.(i) <- nr_red in
+    let () = blue_towers.(i) <- nr_blue in
+
+    if i < n then
+      loop (i + 1)
+    else ()
+
+  in
+
+  let () = loop 0 in
+  red_towers.(n) + blue_towers.(n)
 
 (*----------------------------------------------------------------------------*]
  Na nagradni igri ste zadeli kupon, ki vam omogoča, da v Mercatorju kupite
