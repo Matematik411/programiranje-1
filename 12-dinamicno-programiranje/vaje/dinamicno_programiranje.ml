@@ -1,5 +1,5 @@
 (* ========== Vaje 6: Dinamično programiranje  ========== *)
-
+(* DELAMO OD SPODAJ GOR - "BOTTOM UP" *)
 
 (*----------------------------------------------------------------------------*]
  Požrešna miška se nahaja v zgornjem levem kotu šahovnice. Premikati se sme
@@ -20,6 +20,8 @@ let test_matrix =
   [| [| 1 ; 2 ; 0 |];
      [| 2 ; 4 ; 5 |];
      [| 7 ; 0 ; 1 |] |]
+
+
 
 (*----------------------------------------------------------------------------*]
  Rešujemo problem sestavljanja alternirajoče obarvanih stolpov. Imamo štiri
