@@ -165,7 +165,34 @@ def test_quicksort():
 #     [1,1,2,3,3,4,5,5,6,7,7,10]
 #
 ###############################################################################
-def zlij(target, begin, end, list_1, list_2): #MORDA POPRAVI UČINKOVITOST, KER TA SPREMINJA SEZNAME
+def zlij(target, begin, end, list_1, list_2):
+    prva = 0
+    druga = 0
+    l1 = len(list_1)
+    l2 = len(list_2)
+
+    for i in range(begin, end):
+        if prva >= l1:
+            target[i] = list_2[druga]
+            druga += 1
+        elif druga >= l2:
+            target[i] = list_1[prva]
+            prva += 1
+        
+        elif list_1[prva] <= list_2[druga]:
+            target[i] = list_1[prva]
+            prva += 1
+        else:
+            target[i] = list_2[druga]
+            druga += 1
+
+
+
+
+
+
+
+def zlij_myb_slaba(target, begin, end, list_1, list_2): #MORDA POPRAVI UČINKOVITOST, KER TA SPREMINJA SEZNAME
     for i in range(begin, end):
 
         if list_1 == []:
@@ -177,7 +204,7 @@ def zlij(target, begin, end, list_1, list_2): #MORDA POPRAVI UČINKOVITOST, KER 
             del list_1[0]
 
 
-        elif list_1[0] < list_2[0]:
+        elif list_1[0] <= list_2[0]:
             target[i] = list_1[0]
             del list_1[0]
 
@@ -222,7 +249,7 @@ def mergesort(a):
 
 def test_mergesort():
     for _ in range(1000):
-        a = [random.randint(-100000, 100000) for _ in range(100)]
+        a = [random.randint(-1000000, 1000000) for _ in range(100)]
         b1 = a[:]
         b2 = a[:]
         mergesort(b1)

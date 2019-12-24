@@ -30,8 +30,9 @@ let max_cheese cheese_matrix =
     else 
     Array.length cheese_matrix.(0) in
   let sum_matrix = Array.make_matrix height width 0
+
   in
-  (* malo drugače *)
+  
   let eat i j = 
     let cheese = cheese_matrix.(i).(j) in
     if i < (height - 1) then
@@ -44,17 +45,18 @@ let max_cheese cheese_matrix =
         cheese + sum_matrix.(i).(j+1)
       else
         cheese
-  (* še ena možnost *)
   in
+
+
+  (* (* še ena možnost *)
   let eat2 i j =
     let cheese = cheese_matrix.(i).(j) in
     let max_right = if j < (width - 1) then sum_matrix.(i).(j+1) else 0 in
     let max_down = if i < (height - 1) then sum_matrix.(i+1).(j) else 0 in 
-    cheese + max max_down max_right
+    cheese + max max_down max_right 
+  in *)
 
 
-
-  in
   let rec loop i j = 
     let cheese = eat i j in
     let () = sum_matrix.(i).(j) <- cheese in
@@ -70,21 +72,6 @@ let max_cheese cheese_matrix =
   let () = loop (height - 1) (width - 1) in
   sum_matrix.(0).(0)
 
-  (* let eat i j =
-    match (i, j) with
-    | ((heigth - 1), (width - 1)) -> sum_matrix.(i).(j) <- cheese_matrix.(i).(j)
-    | ((heigth - 1), j) -> sum_matrix.(i).(j) <- cheese_matrix.(i).(j) + sum_matrix.(i).(j+1)
-    | (i, (width - 1)) -> sum_matrix.(i).(j) <- cheese_matrix.(i).(j) + sum_matrix.(i+1).(j)
-    | (i, j)-> sum_matrix.(i).(j) <- cheese_matrix.(i).(j) + (max sum_matrix.(i).(j+1) sum_matrix.(i+1).(j))
-
-  in
-  for i = (height - 1) downto 0 do 
-    for j = (width - 1) downto 0 do (eat i j) done
-  done *)
-
-    
-
-  
 
 (*----------------------------------------------------------------------------*]
  Rešujemo problem sestavljanja alternirajoče obarvanih stolpov. Imamo štiri
@@ -106,13 +93,13 @@ type color =
   | Blue
 
 let alternating_towers n = 
-(* shema dinamičnega programiranja *)
-(* Establish bounds *)
-(* Make memory *)
-(* Calculate one value by using recursion with memory *)
-(* Loop over all values in the correct order *)
-(* Return result *)
-(* The end *)
+  (* shema dinamičnega programiranja *)
+  (* Establish bounds *)
+  (* Make memory *)
+  (* Calculate one value by using recursion with memory *)
+  (* Loop over all values in the correct order *)
+  (* Return result *)
+  (* The end *)
   let red_towers = Array.make (n+1) 0 in
   let blue_towers = Array.make (n+1) 0 in
 
@@ -174,6 +161,46 @@ let articles = [|
   ("juice", 1.15, 2.0)
 |]
 
+let best_value articles max_w =
+  (* Choose the item if you can and recursively search further. *)
+  let rec get_item acc_w acc_p (name, p, w) =
+    if acc_w +. w > max_w then
+      (* Item is not suitable, return what we got so far.*)
+      acc_p
+    else
+      (* Find best value after choosing the item. *)
+      shopper (acc_w +. w) (acc_p +. p)
+  (* Choose every item in the list and return the value of the best choice. *)
+  and shopper w p =
+    let choices = Array.map (get_item w p) articles in
+    Array.fold_left max 0. choices
+  in
+  shopper 0. 0.
+
+
+let best_value_unique articles max_w =
+  (* Store which items have already been chose in the array [taken]. *)
+  (* Choose the item if you can and recursively search further. *)
+  let rec get_item taken acc_w acc_p i (_, p, w) =
+    if acc_w +. w > max_w || taken.(i) then
+      (* Item is not suitable, return what we got so far.*)
+      acc_p
+    else
+      (* Find best value after choosing the item, mark taking the item in [taken]. *)
+      let new_taken = Array.copy taken in
+      let () = new_taken.(i) <- true in
+      shopper new_taken (acc_w +. w) (acc_p +. p)
+  (* Choose every item in the list and return the value of the best choice. *)
+  and shopper taken w p =
+    let choices = Array.mapi (get_item taken w p) articles in
+    Array.fold_left max 0. choices
+  in
+
+  let taken = Array.map (fun _ -> false) articles in
+  shopper taken 0. 0.
+
+
+
 
 (*----------------------------------------------------------------------------*]
  Cena sprehoda po drevesu je vsota vrednosti v vseh obiskanih vozliščih.
@@ -185,14 +212,30 @@ let articles = [|
 - : int option = Some 21
 [*----------------------------------------------------------------------------*)
 
-type 'a tree
- = Empty
+type 'a tree =
+ | Empty
  | Node of ('a tree) * 'a * ('a tree)
 
 let leaf x = Node (Empty, x, Empty)
 
-let test_tree = Node( Node(leaf 0, 2, leaf 13), 5, Node(leaf 9, 7, leaf 4))
+let test_tree =     Node( 
+          Node(leaf 0,    2,    leaf 13),     5,      Node(leaf 9,    7,     leaf 4))
 
+
+
+let rec max_path tree =
+  let vecji = function (* matching (a, b) *)
+    | (None, Some b) -> b
+    | (Some a, None) -> a
+    | (Some a, Some b) -> max a b
+    | _ -> failwith "napaka"
+  in
+  match tree with 
+  | Empty -> None
+  | Node (Empty, x, Empty) -> Some x
+  | Node (left, x, right) -> Some (x + vecji ((max_path left), (max_path right)))
+
+let _ = max_path test_tree;;
 (*----------------------------------------------------------------------------*]
  Cena sprehoda po drevesu je vsota vrednosti v vseh obiskanih vozliščih.
  Poiščite najdražji sprehod od korena do listov drevesa: Funkcija pot vrne v 
@@ -208,6 +251,133 @@ let test_tree = Node( Node(leaf 0, 2, leaf 13), 5, Node(leaf 9, 7, leaf 4))
 - : int list = [5; 7; 9]
 [*----------------------------------------------------------------------------*)
 
-type direcion 
-  = Left
+type direcion =
+  | Left
   | Right
+
+
+let rec max_path_trace = function
+  | Empty | Node (Empty, _, Empty) -> []
+  | Node (left, _, right) when (max_path left) >= (max_path right) -> Left :: (max_path_trace left)
+  | Node (left, _, right) -> Right :: (max_path_trace right)
+
+let rec reconstruct tree dir = 
+  match (tree, dir) with
+  | (Node (_, x, _), []) -> [x]
+  | (Node (left, x, _), Left :: xs) -> x :: (reconstruct left xs)
+  | (Node (_, x, right), Right :: xs) -> x :: (reconstruct right xs)
+  | (_, _) -> failwith "error"
+
+
+
+(* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *)
+(* naloga iz eulerja za najcenejši sprehod  - problem 81 *)
+let my_matrix = [|  [|131; 673; 234; 103; 18|];
+                    [|201; 96;  342; 965; 150|];
+                    [|630; 803; 746; 422; 111|];
+                    [|537; 699; 497; 121; 956|];
+                    [|805; 732; 524; 37;  331|]    |]
+
+
+  (* shema dinamičnega programiranja *)
+  (* Establish bounds *)
+  (* Make memory *)
+  (* Calculate one value by using recursion with memory *)
+  (* Loop over all values in the correct order *)
+  (* Return result *)
+  (* The end *)
+
+let min_path matrix =
+  let h = Array.length matrix in
+  let w = Array.length matrix.(0) in
+
+  let values = Array.make_matrix h w 0 in
+
+  let calculate i j =
+    if i < (h - 1) then
+      if j < (w - 1) then
+        matrix.(i).(j) + (min values.(i).(j+1) values.(i+1).(j))
+      else
+        matrix.(i).(j) + values.(i+1).(j)
+    else
+      if j < (w - 1) then
+        matrix.(i).(j) + values.(i).(j+1)
+      else
+        matrix.(i).(j)
+  
+  in
+  let rec loop i j = 
+    let () = values.(i).(j) <- calculate i j in
+    if j > 0 then
+      loop i (j - 1)
+    else
+      if i > 0 then
+        loop (i - 1) (w - 1)
+      else
+        ()
+  in
+  let () = loop (h - 1) (w - 1) in
+  values.(0).(0)
+
+
+
+let min_path_triple matrix =
+  let h = Array.length matrix in
+  let w = Array.length matrix.(0) in
+
+  let values = Array.make_matrix h w 0 in
+
+  let smallest_up i j =
+    let how_much = ref values.(i).(j+1) in
+    let path = ref 0 in
+    for k = 1 to i do
+      path := !path + matrix.(i-k).(j);
+      how_much := min !how_much (!path + values.(i-k).(j+1));
+      () done;
+    !how_much  
+    
+  in
+  let smallest_down i j =
+    let how_much = ref values.(i).(j+1) in
+    let path = ref 0 in
+    for k = 1 to (h - i - 1) do
+      path := !path + matrix.(i+k).(j);
+      how_much := min !how_much (!path + values.(i+k).(j+1));
+      () done;
+    !how_much  
+
+
+  in
+  let calculate i j =
+    if j < (w - 1) then
+      if i < (h - 1) then
+        if i > 0 then
+          matrix.(i).(j) + (min 
+                                (min (smallest_down i j) (smallest_up i j)) 
+                            values.(i).(j+1))
+        else (* zgornja *)
+          matrix.(i).(j) + (min values.(i).(j+1) (smallest_down i j))
+      else (* spodnja *)
+        matrix.(i).(j) + (min values.(i).(j+1) (smallest_up i j))
+    
+    else
+        matrix.(i).(j)
+  
+  in
+  let rec loop i j = 
+    let () = values.(i).(j) <- calculate i j in
+    if i > 0 then
+      loop (i-1) j
+    else
+      if j > 0 then
+        loop (h - 1) (j - 1)
+      else
+        ()
+  in
+  let () = loop (h - 1) (w - 1) in
+  let resitev = ref values.(0).(0) in
+  for k = 1 to (h - 1) do 
+    resitev := min !resitev values.(k).(0) done;
+  !resitev
+  
+  

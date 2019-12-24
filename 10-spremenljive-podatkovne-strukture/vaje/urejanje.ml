@@ -47,12 +47,17 @@ let tester our_sort len =
 [*----------------------------------------------------------------------------*)
 let insert y xs = 
   let rec insert' acc y already = function
+
     | [] -> if already then List.rev acc
             else List.rev (y :: acc)
+
     | x :: rest when y < x -> if already then insert' (x :: acc) y already rest
                               else insert' (x :: y :: acc) y true rest
+
     | x :: rest -> insert' (x :: acc) y already rest
-  in insert' [] y false xs
+
+  in 
+  insert' [] y false xs
 
 
 let insert_snd y xs = () (*še drug način *)
@@ -159,15 +164,6 @@ let swap a i j =
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  index_min [|0; 2; 9; 3; 6|] 2 4 = 3
 [*----------------------------------------------------------------------------*)
-(* let index_min a lower upper = 
-  let del = Array.sub a lower (upper - lower + 1)
-  in 
-  let rec poisci i indeks m = function
-    | [] -> indeks + lower
-    | x :: xs when x < m -> poisci (i + 1) i x xs
-    | x :: xs -> poisci (i + 1) indeks m xs
-  in
-  poisci 0 upper (a.(0)) a *)
 
 let index_min a lower upper = 
   let rec isci i mini = 
@@ -186,14 +182,16 @@ let index_min a lower upper =
  skupaj z [randlist].
 [*----------------------------------------------------------------------------*)
 let selection_sort_array a = 
-  let d = Array.length a in
-  let rec selection_sort_array' n= 
-    if n = (d - 1) then a
+  let d = Array.length a 
+  in
+  let rec selection_sort_array' n = 
+    if n = (d - 1) then ()
     else  let i = index_min a n (d-1) in
           let () = swap a i n in
           selection_sort_array' (n+1)
   in
   selection_sort_array' 0
+
 
 let tester_array our_sort len = 
   let test = randlist len len in

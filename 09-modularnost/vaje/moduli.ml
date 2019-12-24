@@ -183,7 +183,6 @@ module type COMPLEX = sig
   val conjugate : t -> t
   val add : t -> t -> t
   val multiply : t -> t -> t
-  (* Dodajte manjkajoče! *)
 end
 
 (*----------------------------------------------------------------------------*]
@@ -204,7 +203,7 @@ module Cartesian : COMPLEX = struct
   let add z w = {re = (z.re +. w.re); im = (z.im +. w.im)}
   let multiply z w = {re = (z.re *. w.re) -. (z.im *. w.im); im = (z.im +. w.re) +. (z.re +. w.im)}
   
-  (* Dodajte manjkajoče! *)
+  
 
 end
 
