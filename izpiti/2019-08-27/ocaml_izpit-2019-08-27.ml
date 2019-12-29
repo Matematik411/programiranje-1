@@ -93,9 +93,6 @@ let e2 = alternirajoci_konstruktorji gnezdenje_primer
 
 (* f) *)
 
-  (* | [] -> []
-  | (Element a) :: xs -> (Element (f a)) :: (preslikaj f xs)
-  | (Podseznam x) :: xs -> (Podseznam (preslikaj f x)) :: (preslikaj f xs) *)
 
 let zlozi_preko_gnezdenja f zac list =
   let rec zlozi_preko_gnezdenja' f el = function
