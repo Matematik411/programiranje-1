@@ -141,7 +141,7 @@ let nacini_permutacije n =
   in
   let () = loop 0
   in
-  koliko
+  koliko.(n)
 
 
 
@@ -149,34 +149,31 @@ let nacini_permutacije n =
 let nacini n =
   let st_zabojnikov = Array.length zabojniki
   in
-  let koliko = Array.make (n + 1) 0
+  let koliko = Array.make_matrix st_zabojnikov (n + 1) 0
   in
-  let izracunaj i = 
+  let izracunaj i k = 
     if i = 0 then 1
     else
     let lokalno = ref 0
     in
-    let rec odstevaj n k = 
-      if n - k < 0 then n
-      else odstevaj (n - k) k
-    in
-
     let rec j_ta_masa = function
-      | 0 when ((i - zabojniki.(0)) >= 0) -> (lokalno := !lokalno + koliko.(odstevaj i (zabojniki.(0))))
+      | 0 when ((i - zabojniki.(0)) >= 0) -> (lokalno := !lokalno + koliko.(0).(i - zabojniki.(0)))
       | 0 -> ()
-      | j when ((i - zabojniki.(j)) >= 0) -> (let () = (lokalno := !lokalno + koliko.(odstevaj i (zabojniki.(j))))
+      | j when ((i - zabojniki.(j)) >= 0) -> (let () = (lokalno := !lokalno + koliko.(j).(i - zabojniki.(j)))
                                             in
                                             j_ta_masa (j-1))
       | j -> j_ta_masa (j-1)
-
-
     in 
-    let () = j_ta_masa (st_zabojnikov - 1)
+    let () = j_ta_masa k
     in
     !lokalno
   in
   let rec loop i =
-    let () = koliko.(i) <- (izracunaj i)
+    let rec vsi = function
+      | 0 -> koliko.(0).(i) <- (izracunaj i 0)
+      | k -> (let () = koliko.(k).(i) <- (izracunaj i k) in vsi (k-1))
+    in
+    let () = vsi (st_zabojnikov - 1)
     in
     if i < n then 
       loop (i + 1)
@@ -185,7 +182,7 @@ let nacini n =
   in
   let () = loop 0
   in
-  koliko
+  koliko.(st_zabojnikov - 1).(n)
 
 
 
