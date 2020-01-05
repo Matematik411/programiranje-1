@@ -18,12 +18,6 @@
             },
             "windows": {
                 "command": "python -i \\\"${file}\\\""
-            },
-            "linux": {
-                "command": "python -i \"${file}\""
-            },
-            "osx": {
-                "command": "python -i \"${file}\""
             }
         },
         {
@@ -36,18 +30,18 @@
             "windows": {
                 "command": "ocaml -init \\\"${file}\\\""
             },
-            "linux": {
-                "command": "ocaml -init \"${file}\""
-            },
-            "osx": {
-                "command": "ocaml -init \"${file}\""
-            },
             "problemMatcher": []
         },
         {
             "label": "OCaml_laptop_4.08",
             "type": "shell",
             "command": "C:\\OCaml64\\usr\\local\\bin\\ocaml-env.exe exec -- C:\\OCaml64\\home\\DEMO_0001\\.opam\\ocaml-variants.4.08.0+mingw64c\\bin\\ocaml.exe -init \\\"${file}\\\"",
+            "problemMatcher": []
+        },
+        {
+            "label": "OCaml_domaci_4.08",
+            "type": "shell",
+            "command": "C:\\OCaml64\\usr\\local\\bin\\ocaml-env.exe exec -- C:\\OCaml64\\home\\SISTEM_A\\.opam\\ocaml-variants.4.08.0+mingw64c\\bin\\ocaml.exe -init \\\"${file}\\\"",
             "problemMatcher": []
         }
     ]

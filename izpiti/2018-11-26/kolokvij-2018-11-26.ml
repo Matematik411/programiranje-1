@@ -96,6 +96,7 @@ let naredi_bloke =
       | [] -> naredi_bloke' ([{status = s1; name = n1}] :: accblokov) xs
       | ({status = s2; name = n2} :: ys) :: rest when s1 = s2 -> naredi_bloke' ((({status = s1; name = n1} :: {status = s2; name = n2} :: ys) :: rest) @ accblokov) xs 
       | ({status = s2; name = n2} :: ys) :: rest -> kam_spada (({status = s2; name = n2} :: ys) :: accblokov) rest
+      | _ -> failwith "se ne zgodi"
     in
     kam_spada [] acc
   )

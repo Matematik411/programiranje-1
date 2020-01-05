@@ -23,8 +23,14 @@ module type Comparable = sig
 
 module Cmp_Int = struct
   type t = int
-  let compare x y = failwith "to do"
+  let compare x y = 
+    if x < y then LT
+    else
+    if x > y then GT
+    else
+    EQ
 end
+
 
 (*----------------------------------------------------------------------------*]
  Ko modulu predpišemo signaturo, je potrebno paziti katere tipe naredimo
@@ -39,11 +45,20 @@ module Cmp_Int_prescribed = (Cmp_Int : Comparable with type t = int)
 
 (*----------------------------------------------------------------------------*]
  Sedaj napiši modul, ki primerja nize. Pri pisanju primerjalne funkcije si
- pomagaj s funkcijo [compare] iz vgrajenega modula [Pervasives].
+ pomagaj s funkcijo [compare] iz vgrajenega modula [Stdlib].
 
- Funkcija [Pervasives.compare s t] vrne -1 če je s < t, 0 če s = t in 1 za s > t
+ Funkcija [Stdlib.compare s t] vrne -1 če je s < t, 0 če s = t in 1 za s > t
 [*----------------------------------------------------------------------------*)
 
+(* module Cmp_str : Comparable with type t = string = struct *)
+module Cmp_Str = struct
+  type t = string
+  let compare x y = 
+    match Stdlib.compare x y with
+      | -1 -> LT
+      | 0 -> EQ
+      | _ -> GT
+end
 
 (*----------------------------------------------------------------------------*]
  Funktor je preslikava iz modula v modul. Sedaj definiraj funktor, ki sprejme
@@ -55,23 +70,27 @@ module Cmp_Int_prescribed = (Cmp_Int : Comparable with type t = int)
  modula ujema s tipom modula, ki ga podamo kot argument
 [*----------------------------------------------------------------------------*)
 
-(*
+
 module Cmp_inv (Cmp : Comparable) : Comparable with type t = Cmp.t  = struct
-  type t = ...
-  let compare x y = ...
+  type t = Cmp.t
+  let compare x y = 
+    match Cmp.compare x y with
+      | LT -> GT
+      | GT -> LT
+      | bool -> bool
 end
- *)
+
 
 (*----------------------------------------------------------------------------*]
  Funktor uporabljamo podobno kot funkcije, le da v tem primeru potrebujemo
  oklepaje okrog argumentov
 [*----------------------------------------------------------------------------*)
 
-(*
+
 module Cmp_Int_inv = Cmp_inv (Cmp_Int)
 let _ = Cmp_Int.compare (-9000) 42;;
 let _ = Cmp_Int_inv.compare (-9000) 42;;
- *)
+
 
 (*----------------------------------------------------------------------------*]
  V primeru, ko imamo dva modula A in B, ki ju primerjamo preko [Comparable]
@@ -87,6 +106,16 @@ let _ = Cmp_Int_inv.compare (-9000) 42;;
  [Cmp_lex : Comparable with type t = A.t * B.t]
 [*----------------------------------------------------------------------------*)
 
+module Cmp_lex (A : Comparable) (B : Comparable) : Comparable with type t = A.t * B.t = struct
+  type t = A.t * B.t
+  let compare (a1, b1) (a2, b2) = 
+    match (A.compare a1 a2, B.compare b1 b2) with
+      | (LT, _) | (EQ, LT) -> LT
+      | (GT, _) | (EQ, GT) -> GT
+      | (_, _) -> EQ
+end
+
+module Cmp_NN = Cmp_lex (Cmp_Int) (Cmp_Int)
 
 (*----------------------------------------------------------------------------*]
  Sedaj napišemo signaturo prioritetne vrste. Imamo tip kopice, ki ga označimo s
@@ -95,7 +124,7 @@ let _ = Cmp_Int_inv.compare (-9000) 42;;
  prioriteti. Ker je kopica lahko prazna, nam [pop] vrne opcijski tip
 [*----------------------------------------------------------------------------*)
 
-(*
+
 module type Priority_Queue = sig
     type h
     type el
@@ -103,7 +132,7 @@ module type Priority_Queue = sig
     val pop : h -> (h * el) option
     val push : h -> el -> h
   end
- *)
+
 
 
 (*----------------------------------------------------------------------------*]
@@ -112,13 +141,36 @@ module type Priority_Queue = sig
  prioritetno vrsto preko urejenega seznama. Seznam vsebuje elementa tipa [Cmp.t]
 [*----------------------------------------------------------------------------*)
 
-(*
-module Sorted_List_Priority_Queue ... = struct
 
-  ...
+module Sorted_List_Priority_Queue (Cmp : Comparable) : Priority_Queue with type el = Cmp.t = struct
+  type h = Cmp.t list
+  type el = Cmp.t
+
+  let empty = []
+
+  let pop = function
+    | [] -> None
+    | x :: xs -> Some (xs, x)
+
+  let rec push list a = 
+    match list with
+      | [] -> [a]
+      | x :: xs -> match Cmp.compare a x with
+                    | LT -> a :: x :: xs
+                    | EQ -> x :: xs
+                    | GT -> x :: (push xs a)
 
 end
-*)
+
+
+(*----------------------------------------------------------------------------*]
+ Apply your functor to build a priority queue of integers, and a priority queue
+ of strings. Write some examples using push and pop!
+[*----------------------------------------------------------------------------*)
+
+module IntH = Sorted_List_Priority_Queue (Cmp_Int)
+module StringH = Sorted_List_Priority_Queue (Cmp_Str)
+
 
 
 (*----------------------------------------------------------------------------*]
@@ -126,7 +178,12 @@ end
  vrne modul z operacijo [to_list] s katero elemente v kopici shrani v seznam. 
 [*----------------------------------------------------------------------------*)
 
-(* module To_List ... *)
+module To_List (H : Priority_Queue) = struct
+  let rec to_list h = 
+    match H.pop h with
+      | None -> []
+      | Some (xs, x) -> x :: (to_list xs)
+end
 
 
 (*----------------------------------------------------------------------------*]
@@ -136,15 +193,15 @@ end
  ko pa uporabljamo module lokalno si lahko privoščimo krajša imena
 [*----------------------------------------------------------------------------*)
    
-(*
-let _ =
+
+let abc =
   let h = List.fold_left IntH.push IntH.empty [1; 0; 9; 2] in
   let module TL = To_List(IntH) in
   TL.to_list h
 
-let _ =
+let def =
   let module H = Sorted_List_Priority_Queue (Cmp_inv(Cmp_Int)) in
   let module L = To_List(H) in
   let h = List.fold_left H.push H.empty [1; 0; 9; 2] in
   L.to_list h
- *)
+
