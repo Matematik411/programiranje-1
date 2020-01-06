@@ -7,35 +7,9 @@ from functools import lru_cache
 # Na primer: V seznamu [2, 3, 6, 8, 4, 4, 6, 7, 12, 8, 9] je najdaljse naj vrne
 # rezultat [2, 3, 4, 4, 6, 7, 8, 9].
 ###############################################################################
-testni = [100,2, 3, 6, 8, 4, 4, 6, 7, 12, 8, 9]
+testni = [100, 3, 2, 3, 6, 8, 4, 4, 6, 7, 12, 8, 9]
+test = [11, 11, 11, 11, 11, 11, 2, 2, 2, 2, 2]
 
-
-def najdaljse_narascajoce_podzaporedje_ne_dela(sez):
-    d = len(sez)
-    
-    @lru_cache(maxsize=None)
-    def zgradi(i, value, prej):
-        if i == d - 1:
-            return []
-
-        nov = [sez[i]] + zgradi(i+1, sez[i], 1)
-        
-
-
-        dodatno = []
-        if value is not None:
-            if sez[i] >= value:
-                dodatno = [sez[i]] + zgradi(i+1, sez[i], prej + 1)
-            else:
-                dodatno = zgradi(i+1, value, prej)
-
-            if len(nov) > (len(dodatno) + prej):
-                return nov
-            else:
-                return dodatno
-        return nov
-
-    return zgradi(0, None, 0)
 
 def najdaljse_narascajoce_podzaporedje(sez):
     d = len(sez)
@@ -58,7 +32,6 @@ def najdaljse_narascajoce_podzaporedje(sez):
 
 
 def naj(sez):
-
     return najdaljse_narascajoce_podzaporedje(sez)
 
 ###############################################################################
@@ -95,5 +68,33 @@ soba = [[0, 1, 0, 0, 2],
         [0, 0, 0, 2, 2]]
 
 
+# smeri gor | desno | dol | levo
+# smeri 0     1       2     3
+
 def pobeg(soba, pozicija, koraki):
-    return None
+    visina = len(soba)
+    sirina = len(soba[0])
+
+
+
+    @lru_cache(maxsize=None)
+    def robotek(pozicija, koraki):
+        y, x = pozicija
+        if not (0 <= y <= visina - 1) or not (0 <= x <= sirina - 1):
+            return 0
+
+        if soba[y][x] == 1:
+            return 1
+        
+        if koraki < 1:
+            return 0
+
+        if soba[y][x] != 0:
+            return 0
+        resen = 0
+        resen = max(resen, robotek((y+1, x), koraki - 1), robotek((y, x+1), koraki - 1),robotek((y-1, x), koraki - 1), robotek((y, x-1), koraki - 1))
+        return resen
+
+    return robotek(pozicija, koraki)
+        
+print(pobeg(soba, (5, 1), 50))
