@@ -42,13 +42,13 @@ def max_cheese(cheese_matrix):
 
 
 
-#   (* (* še ena možnost *)
-#   let eat2 i j =
-#     let cheese = cheese_matrix.(i).(j) in
-#     let max_right = if j < (width - 1) then sum_matrix.(i).(j+1) else 0 in
-#     let max_down = if i < (height - 1) then sum_matrix.(i+1).(j) else 0 in 
-#     cheese + max max_down max_right 
-#   in *)
+    # še ena možnost
+    def eat2(i,j):
+        cheese = cheese_matrix[i][j]
+        max_right = sum_matrix[i][j+1] if j < (width - 1) else 0
+        max_down = sum_matrix[i+1][j] if i < (height - 1) else 0
+
+        return cheese + max(max_down, max_right) 
 
 
     def loop(i, j): 
@@ -58,7 +58,7 @@ def max_cheese(cheese_matrix):
             loop(i, (j - 1))
         elif i > 0: #nova vrstica
             loop((i - 1), (width - 1))
-
+    
     loop((height - 1),(width - 1))
     return sum_matrix[0][0]
 
