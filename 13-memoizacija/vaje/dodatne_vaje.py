@@ -7,10 +7,10 @@ from functools import lru_cache
 # Na primer: V seznamu [2, 3, 6, 8, 4, 4, 6, 7, 12, 8, 9] je najdaljse naj vrne
 # rezultat [2, 3, 4, 4, 6, 7, 8, 9].
 ###############################################################################
-testni = [2, 3, 6, 8, 4, 4, 6, 7, 12, 8, 9]
+testni = [100,2, 3, 6, 8, 4, 4, 6, 7, 12, 8, 9]
 
 
-def najdaljse_narascajoce_podzaporedje(sez):
+def najdaljse_narascajoce_podzaporedje_ne_dela(sez):
     d = len(sez)
     
     @lru_cache(maxsize=None)
@@ -36,6 +36,26 @@ def najdaljse_narascajoce_podzaporedje(sez):
         return nov
 
     return zgradi(0, None, 0)
+
+def najdaljse_narascajoce_podzaporedje(sez):
+    d = len(sez)
+    
+    @lru_cache(maxsize=None)
+    def zgradi(i, value):
+        if i >= d:
+            return []
+        elif sez[i] < value:
+            return zgradi(i+1, value)
+        else:
+            sprejmemo = [sez[i]] + zgradi(i+1, sez[i])
+            zavrnemo = zgradi(i+1, value)
+            if len(sprejmemo) > len(zavrnemo):
+                return sprejmemo
+            else:
+                return zavrnemo
+
+    return zgradi(0, min(sez))
+
 
 def naj(sez):
 
