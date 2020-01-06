@@ -7,10 +7,39 @@ from functools import lru_cache
 # Na primer: V seznamu [2, 3, 6, 8, 4, 4, 6, 7, 12, 8, 9] je najdaljse naj vrne
 # rezultat [2, 3, 4, 4, 6, 7, 8, 9].
 ###############################################################################
+testni = [2, 3, 6, 8, 4, 4, 6, 7, 12, 8, 9]
 
 
 def najdaljse_narascajoce_podzaporedje(sez):
-    return None
+    d = len(sez)
+    
+    @lru_cache(maxsize=None)
+    def zgradi(i, value, prej):
+        if i == d - 1:
+            return []
+
+        nov = [sez[i]] + zgradi(i+1, sez[i], 1)
+        
+
+
+        dodatno = []
+        if value is not None:
+            if sez[i] >= value:
+                dodatno = [sez[i]] + zgradi(i+1, sez[i], prej + 1)
+            else:
+                dodatno = zgradi(i+1, value, prej)
+
+            if len(nov) > (len(dodatno) + prej):
+                return nov
+            else:
+                return dodatno
+        return nov
+
+    return zgradi(0, None, 0)
+
+def naj(sez):
+
+    return najdaljse_narascajoce_podzaporedje(sez)
 
 ###############################################################################
 # Nepreviden študent je pustil robotka z umetno inteligenco nenadzorovanega.
