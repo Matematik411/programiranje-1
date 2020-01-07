@@ -97,4 +97,39 @@ def pobeg(soba, pozicija, koraki):
 
     return robotek(pozicija, koraki)
         
+def pobeg2(soba, pozicija, koraki):
+    visina = len(soba)
+    sirina = len(soba[0])
+
+
+
+    @lru_cache(maxsize=None)
+    def robotek2(pozicija, koraki, smer):
+        y, x = pozicija
+        if not (0 <= y <= visina - 1) or not (0 <= x <= sirina - 1):
+            return 0
+
+        if soba[y][x] == 1:
+            return 1
+        
+        if koraki < 1:
+            return 0
+
+        if soba[y][x] != 0:
+            return 0
+        resen = 0
+        if smer != 0:
+            resen = max(resen, robotek2((y-1, x), koraki - 1, 2))
+        if smer != 1:
+            resen = max(resen, robotek2((y, x-1), koraki - 1, 3))
+        if smer != 2:
+            resen = max(resen, robotek2((y+1, x), koraki - 1, 0))
+        if smer != 3:
+            resen = max(resen, robotek2((y, x+1), koraki - 1, 1))
+
+        return resen
+
+    return robotek2(pozicija, koraki, 5)
+
 print(pobeg(soba, (5, 1), 50))
+print(pobeg2(soba, (5, 1), 50))
