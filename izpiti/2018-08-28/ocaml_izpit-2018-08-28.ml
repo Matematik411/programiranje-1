@@ -43,30 +43,38 @@ let test_2 = Node (Node (leaf 20, 10, Node (leaf 15, 9, leaf 6)), 7, Node (leaf 
 
 let daljsi xs ys = if List.length xs >= List.length ys then xs else ys
 
-let rec dol a = function  
+let rec dol zgornja_meja = function  
   | Empty -> []
-  | Node (l, x, r) when x > a -> [] 
+  | Node (l, x, r) when x > zgornja_meja -> [] 
   | Node (l, x, r) -> x :: (daljsi (dol x l) (dol x r)) 
 
-let rec gor a = function  
+let rec gor spodnja_meja = function  
   | Empty -> []
-  | Node (l, x, r) when x < a -> [] 
+  | Node (l, x, r) when x < spodnja_meja -> [] 
   | Node (l, x, r) -> x :: (daljsi (gor x l) (gor x r)) 
 
 
-let rec glavna = function
+let rec monotona_pot = function
   | Empty -> []
   | Node (l, x, r) ->
       let prvi_primer = (List.rev (dol x l)) @ [x] @ (gor x r) in
       let drugi_primer = (List.rev (gor x l)) @ [x] @ (dol x r) in
       let daljsa_tu = daljsi prvi_primer drugi_primer in
-      let daljsa_poddrevesa = daljsi (glavna l) (glavna r) in
+      let daljsa_poddrevesa = daljsi (monotona_pot l) (monotona_pot r) in
       daljsi daljsa_tu daljsa_poddrevesa
 
-let a2_1 = glavna test_1
-let a2_2 = glavna test_2
+let a2_1 = monotona_pot test_1
+let a2_2 = monotona_pot test_2
+
+
+
+
+
+
+
 
 (* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *)
+
 (* 3. *)
 type 'a veriga =
   | Filter of ('a -> bool) * 'a list * 'a veriga
@@ -81,7 +89,7 @@ let rec vstavi a = function
   | Filter (f, xs, veriga) when (f a) -> Filter (f, a :: xs, veriga)
   | Filter (f, xs, veriga) -> Filter (f, xs, vstavi a veriga)
 
-let b3 = List.fold_right vstavi [-5;7;100;-7;2] test
+let b3 = List.fold_left (fun fil x -> vstavi x fil) test [-5;7;100;-7;2]
 
 (* c) *)
 let posci a veriga = 
@@ -121,7 +129,14 @@ let izprazni_filtre veriga =
   in
   izprazni_filtre' [] [] veriga
 
-let d3 = izprazni_filtre b3
+let rec izprazni = function
+  | Ostalo xs -> (Ostalo [], xs)
+  | Filter (f, xs, chain) ->
+    let veriga, sez = izprazni chain in
+    (Filter (f, [], veriga), xs @ sez)
+
+let d3_1 = izprazni_filtre b3
+let d3_2 = izprazni b3
 
 (* e) *)
 let dodaj_filter f veriga =
@@ -129,7 +144,7 @@ let dodaj_filter f veriga =
   in
   let nova_veriga = Filter (f, [], stara_veriga)
   in
-  List.fold_right vstavi seznam nova_veriga
+  List.fold_right vstavi seznam nova_veriga  
 
 let e3 = dodaj_filter (fun x -> x mod 2 = 0) b3
 
