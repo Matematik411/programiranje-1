@@ -136,6 +136,69 @@ let seznam_iz_mm drevo =
 (* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *)
 (* 3. *)
 
+(* Poskusim napisati še memoizacijo v OCaml *)
+open Format
+
+let find_opt hashtbl x =
+  try Some (Hashtbl.find hashtbl x) 
+  with
+    Not_found -> None
+
+let memoiziraj odviti_f =
+  let rezultati = Hashtbl.create 512 in
+  let rec mem_f x y =
+    match find_opt rezultati (x,y) with
+      | Some z -> z
+      | None -> let z = odviti_f mem_f x y in
+                let () = Hashtbl.add rezultati (x,y) z in
+                z
+  in
+  mem_f
+
+
+let prvi_testni = [|2; 4; 1; 2; 1; 3; 1; 1; 5|]
+let drugi_testni = [|4; 1; 8; 2; 11; 1; 1; 1; 1; 1|]
+
+
+let skakanje_brez_mem mocvirje = 
+  let dolzina = Array.length mocvirje 
+  in
+
+  let rec zaba kje en = 
+      printf "%d %d-" kje en;
+      if kje >= (dolzina - 1) then 0
+      else
+        let optimalno = ref dolzina in
+        let skupna_en = en + mocvirje.(kje) in
+        for skok = 1 to skupna_en do
+          optimalno := min (1 + (zaba (kje + skok) (skupna_en - skok))) (!optimalno)
+        done;
+        !optimalno
+  in
+
+  zaba 0 0
+
+
+let skakanje mocvirje = 
+  let dolzina = Array.length mocvirje 
+  in
+
+  let rec zaba f kje en = 
+      printf "%d %d-" kje en;
+      if kje >= (dolzina - 1) then 0
+      else
+        let optimalno = ref dolzina in
+        let skupna_en = en + mocvirje.(kje) in
+        for skok = 1 to skupna_en do
+          optimalno := min (1 + (f (kje + skok) (skupna_en - skok))) (!optimalno)
+        done;
+        !optimalno
+  in
+
+  let mem_zaba = memoiziraj zaba
+  in
+
+  mem_zaba 0 0
 
 
 

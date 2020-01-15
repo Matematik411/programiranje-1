@@ -43,7 +43,7 @@ let rec fib n = odviti_fib fib n
 (* obicajna rekurzivna funkcija : A -> B *)
 (* odvita funkcija : (A -> B) -> (A -> B) *)
 (* zavezi vozel : ((A -> B) -> (A -> B)) -> (A -> B) *)
-
+ 
 let memoiziraj_rec odviti_f =
   let rezultati = Hashtbl.create 512 in
   let rec mem_f x =

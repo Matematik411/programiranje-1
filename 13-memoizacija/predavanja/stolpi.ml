@@ -11,16 +11,16 @@ and modri = function
 let stolpi = function
   | 0 -> 1
   | n -> rdeci n + modri n
-
+open Format
 let odviti_rdeci _ m = function
   | 0 -> 1
   | n when n < 0 -> 0
-  | n -> m (n - 1) + m (n - 2)
+  | n -> printf "R%d-" n; m (n - 1) + m (n - 2)
 
 let odviti_modri r _ = function
   | 0 -> 1
   | n when n < 0 -> 0
-  | n -> r (n - 2) + r (n - 3)
+  | n -> printf "M%d-" n; r (n - 2) + r (n - 3)
 
 let memoiziraj_rec2 odviti_f odviti_g =
   let rezultati_f = Hashtbl.create 512 in
