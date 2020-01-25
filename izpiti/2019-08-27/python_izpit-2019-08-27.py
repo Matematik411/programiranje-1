@@ -1,7 +1,7 @@
 
 from functools import lru_cache
 
-aa =    [[(1, 10), (3, -10)],    # 0
+finska =    [[(1, 10), (3, -10)],    # 0
         [(2, 10), (5, -20)],    # 1
         [(3, -10)],             # 2
         [(4, 15)],              # 3
@@ -29,7 +29,7 @@ def pot(mesta):
     
     return premik(0, 0)
         
-print(pot(aa))
+print(pot(finska))
 
 
 

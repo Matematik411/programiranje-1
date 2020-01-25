@@ -125,7 +125,7 @@ let izprazni_filtre veriga =
   let rec izprazni_filtre' f_acc list_acc = function
     | Ostalo xs when (f_acc = []) -> (Ostalo [], xs) (* to se zgodi le če začetni samo Ostalo xs *)
     | Ostalo xs -> (zgradi f_acc, stakni list_acc xs)
-    | Filter (f, xs, chain) -> izprazni_filtre' (f :: f_acc) (stakni list_acc xs) chain
+    | Filter (f, xs, chain) -> izprazni_filtre' (f :: f_acc) (stakni list_acc (List.rev xs)) chain
   in
   izprazni_filtre' [] [] veriga
 
@@ -144,7 +144,7 @@ let dodaj_filter f veriga =
   in
   let nova_veriga = Filter (f, [], stara_veriga)
   in
-  List.fold_right vstavi seznam nova_veriga  
+  List.fold_left (fun fil x -> vstavi x fil) nova_veriga seznam  
 
 let e3 = dodaj_filter (fun x -> x mod 2 = 0) b3
 

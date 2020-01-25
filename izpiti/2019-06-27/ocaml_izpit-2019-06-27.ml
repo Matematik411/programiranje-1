@@ -96,9 +96,9 @@ let rec vsi_obdelovalci = function
   | Obdelovan os -> [os]
   | Oddan (_, (prvi, ostali)) ->
       let vsi_od_seznama = 
-        List.fold_left (fun a b -> a @ (vsi_najemniki b)) [] ostali
+        List.fold_left (fun a b -> a @ (vsi_obdelovalci b)) [] ostali
       in
-      (vsi_najemniki prvi) @ (vsi_od_seznama)
+      (vsi_obdelovalci prvi) @ (vsi_od_seznama)
 
 let f2 = vsi_obdelovalci vrt_primer
 

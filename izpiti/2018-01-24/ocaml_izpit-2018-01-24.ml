@@ -63,7 +63,7 @@ let rec preveri tree =
   in
   let preveri_box lower upper list = 
     match (lower, upper) with
-      | (None, None) -> failwith "napaka"
+      | (None, None) -> true (* do tega pride le če na začetku samo en Box *)
       | (None, Some u) -> vsa_manjsa u list
       | (Some l, None) -> vsa_vecja l list
       | (Some l, Some u) -> vsa_vecja l list && vsa_manjsa u list

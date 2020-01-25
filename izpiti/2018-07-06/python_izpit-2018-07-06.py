@@ -103,7 +103,7 @@ def vsotno_simetricen(niz):
 # e)Za primer,  da se bo dr. Ana Kek kdaj zacela zanimati tudi za druge vrste simetrij,  funkciji stevilo_delov in razdeli napišite tako, da za drugi argument spremejo funkcijo, ki preverja ali je nek del simetricen.
 # Primer:>>> razdeli("00101011", simetricen) -> ["0", "01010", "11"]
 # >>> razdeli("00101011", vsotno_simetricen) -> ["00", "101011"]
-# >>> razdeli("00101011", simetricen) -> ["0", "01010", "11"]
+# >>> stevilo_delov("00101011", simetricen) -> 3
 
 def stevilo_delov(zapestnica, f):
     dolzina = len(zapestnica)

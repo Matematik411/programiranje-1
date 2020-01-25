@@ -9,7 +9,7 @@ def obiranje(sadovnjak, vseh_potez):
     dolzina = len(sadovnjak[0])
 
     @lru_cache(maxsize=None)
-    def macek(y, x, poteze):
+    def lisjak(y, x, poteze):
         if y >= visina or x >= dolzina:
             return -1
 
@@ -19,8 +19,8 @@ def obiranje(sadovnjak, vseh_potez):
     
         poteze -= 1
         return sadovnjak[y][x] + max(
-            macek(y, x + 1, poteze),
-            macek(y + 1, 0, poteze)
+            lisjak(y, x + 1, poteze),
+            lisjak(y + 1, 0, poteze)
         )
 
-    return macek(0, 0, vseh_potez)
+    return lisjak(0, 0, vseh_potez)
