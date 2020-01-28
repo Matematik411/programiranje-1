@@ -49,8 +49,8 @@ def postavitve(n, m, l):
     def moznosti(i, k):
         if i < 0 or i >= n:
             return 0
-        elif k == 0:
-            return 1
+        elif k == 0: # do tega pride le če m = 0
+            return 0
 
         elif k == 1: # postavi na poljubno mesto
             return n - i  - (l - 1)
@@ -58,7 +58,7 @@ def postavitve(n, m, l):
         mozni = 0 
 
         
-        for j in range((n-1) - (m-1)*(l+1)):
+        for j in range((n-1) - (k-1)*(l+1)):
             mozni += moznosti(i + j + l + 1 , k-1)
 
         return mozni
@@ -71,3 +71,26 @@ print(postavitve(3, 1, 1)) #3
 
 
 
+
+def postavitve_mesano(n, sez):
+    l = len(sez)
+    if l == 0:
+        return 1
+
+    @lru_cache(maxsize=None)
+    def moznosti(i, k):
+        if i < 0 or i >= n:
+            return 0
+            
+        elif k == l-1: # postavi na poljubno mesto
+            return n - i  - ((sez[k]) - 1)
+
+        mozni = 0 
+
+        
+        for j in range((n-1) - sum(sez[k+1:]) - (l - k - 1)):
+            mozni += moznosti(i + j + sez[k] + 1 , k+1)
+
+        return mozni
+
+    return moznosti(0, 0)
