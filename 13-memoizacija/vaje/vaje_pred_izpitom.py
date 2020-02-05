@@ -164,3 +164,137 @@ def sluzbe(n, dela):
 print(sluzbe(nr, jobs))
 
             
+# 6 
+# Count all increasing subsequences
+# We are given an array of digits (values lie in range from 0 to 9). The task is to count all the sub sequences possible in array such that in each subsequence every digit is greater than its previous digits in the subsequence.
+
+example_array = [3,2,4,5,4]
+
+def nar_podzaporedje(seznam):
+    d = len(seznam)
+
+    @lru_cache(maxsize=None)
+    def se_konča_na(i):
+        if i == 0:
+            return 1
+        
+        skupno = 1 # samo ta
+
+        for j in range(i):
+            if seznam[j] < seznam[i]: # dodamo tiste ki so se končali na manjši vrednosti
+                skupno += se_konča_na(j)
+        
+        
+        return skupno
+
+    return sum([se_konča_na(k) for k in range(d)])
+
+def nar_podzaporedje_vemo_elemente(seznam):
+    # ker vemo da imamo le elemente od 0 do 9, zgradimo pomožni seznam, ki shrani koliko seznamov se je DO ZDAJ končalo na to številko
+
+    konec = [0] * 10
+
+    def mesto(i):
+        skupno = 1
+        for j in range(seznam[i]):
+            skupno += konec[j]
+        
+        return skupno
+
+    for k in range(len(seznam)):
+        konec[seznam[k]] += mesto(k)
+    
+    return sum(konec)
+        
+print(nar_podzaporedje(example_array))
+print(nar_podzaporedje_vemo_elemente(example_array))
+
+
+# 7
+# Maximum Product Cutting | DP-36
+# Given a rope of length n meters, cut the rope in different parts of integer lengths in a way that maximizes product of lengths of all parts. You must make at least one cut. Assume that the length of rope is more than 2 meters.
+
+rope = 10
+
+def rezanje_vrvi(dolzina): # dolzina >= 2
+
+    @lru_cache(maxsize=None)
+    def primer(d):
+        najboljse = d-1 #samo odrezemo enko stran
+
+        for i in range(2, d-1):
+            najboljse = max(najboljse, i * primer(d-i)) # prej razrezano
+            najboljse = max(najboljse, i * (d-i)) # prej celo
+
+        return najboljse
+    
+    return primer(dolzina)
+
+print(rezanje_vrvi(rope))
+
+
+# 8
+# Maximum average sum partition of an array
+# Given an array, we partition a row of numbers A into at most K adjacent (non-empty) groups, then the score is the sum of the average of each group. What is the maximum score that can be scored?
+
+A = [1,2,3,4,5,6,7]
+K = 4
+def average(list):
+    return round(sum(list) / len(list),2)
+
+def vsota_povprecij_delov(seznam,st_delov):
+
+    @lru_cache(maxsize=None)
+    def prvih(i, k):
+        if i < k-1 or i < 0:
+            return 0
+        elif i == k-1:
+            return sum(seznam[:i+1])
+        elif k == 1:
+            return average(seznam[:i+1])
+
+        optimalno = prvih(i-1, k-1) + seznam[i] # samo naredimo nov del
+
+        for j in range(i-1): # združimo z prejšnjo
+            optimalno = max(optimalno, prvih(j, k-1) + average(seznam[j+1:i+1]))
+        
+        return optimalno
+    
+    return prvih(len(seznam) - 1, st_delov)
+        
+print(vsota_povprecij_delov(A, K))
+
+
+# 9 
+# Minimum jumps to reach last building in a matrix
+# Given a matrix containing an integer value, In which each cell of the matrix represents height of building. Find minimum jumps needed reach from First building (0, 0) to last (n-1, m-1). Jump from a cell to next cell is absolute difference between two building heights.
+
+stolpnice = [[ 5, 4, 2 ],
+             [ 9, 2, 1 ],
+             [ 2, 5, 9 ],
+             [ 1, 3, 11]] 
+
+def skakac(mreza):
+    visina = len(mreza)
+    sirina = len(mreza[0])
+
+    @lru_cache(maxsize=None)
+    def stevilo_skokov(y, x):
+        if y > 0:
+            if x > 0:
+                return min(
+                    stevilo_skokov(y-1, x) + abs(mreza[y][x] - mreza[y-1][x]), # pride od zgoraj
+                    stevilo_skokov(y, x-1) + abs(mreza[y][x] - mreza[y][x-1]), # pride iz leve
+                    stevilo_skokov(y-1, x-1) + abs(mreza[y][x] - mreza[y-1][x-1]), # skoci po diagonali
+                )
+            else:
+                return stevilo_skokov(y-1, x) + abs(mreza[y][x] - mreza[y-1][x]) # pride od zgoraj
+        else:
+            if x > 0:
+                return stevilo_skokov(y, x-1) + abs(mreza[y][x] - mreza[y][x-1]) # pride iz leve
+            else:
+                return 0
+
+    return stevilo_skokov(visina - 1, sirina - 1)
+
+print(skakac(stolpnice))
