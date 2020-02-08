@@ -298,3 +298,125 @@ def skakac(mreza):
     return stevilo_skokov(visina - 1, sirina - 1)
 
 print(skakac(stolpnice))
+
+# 10
+# Minimum Initial Points to Reach Destination
+# Given a grid with each cell consisting of positive, negative or no points i.e, zero points. We can move across a cell only if we have positive points ( > 0 ). Whenever we pass through a cell, points in that cell are added to our overall points. We need to find minimum initial points to reach cell (m-1, n-1) from (0, 0).
+
+
+point_grid = [ [-2, -3,   3], 
+          [-5, -10,  1], 
+          [10,  30, -5] ]
+
+R = 3
+C = 3
+  
+def minInitialPoints(points): 
+    ''' 
+    dp[i][j] represents the minimum initial 
+    points player should have so that when  
+    starts with cell(i, j) successfully 
+    reaches the destination cell(m-1, n-1) 
+    '''
+    dp = [[0 for x in range(C + 1)]  
+             for y in range(R + 1)] 
+    m, n = R, C 
+      
+    if points[m - 1][n - 1] > 0: 
+        dp[m - 1][n - 1] = 1
+    else: 
+        dp[m - 1][n - 1] = abs(points[m - 1][n - 1]) + 1
+    ''' 
+    Fill last row and last column as base 
+    to fill entire table 
+    '''
+    for i in range (m - 2, -1, -1): 
+        dp[i][n - 1] = max(dp[i + 1][n - 1] -
+                           points[i][n - 1], 1) 
+    for i in range (2, -1, -1): 
+        dp[m - 1][i] = max(dp[m - 1][i + 1] -
+                           points[m - 1][i], 1) 
+    ''' 
+    fill the table in bottom-up fashion 
+    '''
+    for i in range(m - 2, -1, -1): 
+        for j in range(n - 2, -1, -1): 
+            min_points_on_exit = min(dp[i + 1][j], 
+                                     dp[i][j + 1]) 
+            dp[i][j] = max(min_points_on_exit -
+                               points[i][j], 1) 
+
+    print(dp)          
+    return dp[0][0]  
+
+print(minInitialPoints(point_grid))
+
+# 11
+# Find minimum adjustment cost of an array
+# Given an array of positive integers, replace each element in the array such that the difference between adjacent elements in the array is less than or equal to a given target. We need to minimize the adjustment cost, that is the sum of differences between new and old values. We basically need to minimize &Sum;|A[i] – Anew[i]| where 0 ≤ i ≤ n-1, n is size of A[] and Anew[] is the array with adjacent difference less that or equal to target.
+
+# Assume all elements of the array is less than constant M = 100.
+
+array = [55, 77, 52, 61, 39, 6, 25, 60, 49, 47]
+target = 10
+M = 100
+
+
+
+def poprava_seznama(seznam, tarca):
+    n = len(seznam)
+
+    # tabela za vrednosti 
+    vrednosti = [[0 for _ in range(M + 1)]
+                for _ in range(n)]
+    
+    # prvi
+    for j in range(M + 1):
+        vrednosti[0][j] = abs(j - seznam[0])
+
+    # ostali
+    for m in range(1, n):
+        # poračuna minimalno skupno ceno, za primer, ko se seznam[m] sremeni na to vrednost
+        for j in range(M + 1):
+            cena = n * M  #nekaj kar ne moremo doseči
+
+            for k in range(M + 1):
+                if k >= j - tarca and k <= j + tarca: #katere vrednosti prejsnjega nas zanimajo
+                    cena = min(cena,
+                                vrednosti[m - 1][k] + abs(j - seznam[m]))
+            
+            vrednosti[m][j] = cena
+    
+    #vrniti zelimo minimum zadnje vrstice
+    resitev = M * n
+    for j in range(M + 1):
+        resitev = min(resitev, vrednosti[n-1][j])
+    
+    return resitev
+
+def poprava_seznama_s_funkcijo(seznam, tarca):
+    n = len(seznam)
+
+    @lru_cache(maxsize=None)
+    def aux(m, j):
+        if m == 0:
+            return abs(j - seznam[m])
+        
+        cena = n * M  #nekaj kar ne moremo doseči
+
+        for k in range(M + 1):
+            if k >= j - tarca and k <= j + tarca: #katere vrednosti prejsnjega nas zanimajo
+                cena = min(cena,
+                            aux(m - 1,k) + abs(j - seznam[m]))
+        
+        return cena
+    
+    #vrniti zelimo minimum zadnje vrstice
+    resitev = M * n
+    for j in range(M + 1):
+        resitev = min(resitev, aux(n-1,j))
+    
+    return resitev
+
+print(poprava_seznama(array, target))
+print(poprava_seznama_s_funkcijo(array, target))
