@@ -420,3 +420,103 @@ def poprava_seznama_s_funkcijo(seznam, tarca):
 
 print(poprava_seznama(array, target))
 print(poprava_seznama_s_funkcijo(array, target))
+
+# 12
+# Longest palindromic subsequence
+
+word = "GEEKSFORGEEKS"
+
+
+def je_palindrom(niz):
+    return niz == niz[::-1]
+
+def podpalindrom(beseda):
+    n = len(beseda)
+
+    @lru_cache(maxsize=None)
+    def polozaj(i, niz):
+        if je_palindrom(niz + beseda[i]):
+            optimalno = len(niz) + 1
+            if i == n - 1:
+                return optimalno
+        else:
+            optimalno = 0        
+        
+        if i == n - 1:
+            return 1
+            
+        
+        optimalno = max(optimalno, polozaj(i+1, ""))
+
+
+        for k in range(i+1, n):
+            optimalno = max(optimalno, polozaj(k, niz + beseda[i]))
+            optimalno = max(optimalno, polozaj(k, niz))
+        
+        return optimalno
+
+    return polozaj(0, "")
+
+def vrne_podpalindrom(beseda):
+    n = len(beseda)
+
+    @lru_cache(maxsize=None)
+    def polozaj(i, niz):
+        if je_palindrom(niz + beseda[i]):
+            optimalno = niz + beseda[i]
+            if i == n - 1:
+                return optimalno
+        else:
+            optimalno = ""   
+        
+        if i == n - 1:
+            return beseda[-1]
+            
+        if len(polozaj(i+1, "")) > len(optimalno):
+            optimalno = polozaj(i+1, "")
+
+
+        for k in range(i+1, n):
+            if len(polozaj(k, niz + beseda[i])) > len(optimalno):
+                optimalno = polozaj(k, niz + beseda[i])
+            if len(polozaj(k, niz)) > len(optimalno):
+                optimalno = polozaj(k, niz)
+        
+        return optimalno
+
+    return polozaj(0, "")
+
+print(podpalindrom(word))
+print(vrne_podpalindrom(word))
+
+# 13 
+# Knapsack's problem
+
+val = [1,4,5,22,52]
+wt =  [4,2,9,12,44]
+W = 50
+
+def knapsack(values, weights, w):
+    n = len(values)
+
+    @lru_cache(maxsize=None)
+    def primer(i, masa): #grem po vrsti
+        if i == n - 1:
+            if masa  + weights[i] <= w:
+                return values[i]
+            else:
+                return 0
+
+        spustim = primer(i + 1, masa)
+        if masa + weights[i] <= w:
+            dodam = primer(i + 1, masa + weights[i]) + values[i]
+        else:
+            dodam = 0
+        
+        return max(spustim, dodam)
+    
+    return primer(0, 0)
+
+print(knapsack(val, wt, W))
+        
+        
