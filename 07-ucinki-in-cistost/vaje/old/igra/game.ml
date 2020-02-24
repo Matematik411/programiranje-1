@@ -70,8 +70,8 @@ let rec run_game () =
 (* Odkomentiraj naslednji del v primeru, ko želiš, da se igra zažene takoj,
    ko uporabiš datoteko (uporabno pri prevedenih datotekah). *)
 
-(*
+(* 
 
 let () = run_game ()
-
-*)
+ 
+ *)
