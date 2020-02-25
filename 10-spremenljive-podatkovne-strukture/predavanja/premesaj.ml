@@ -89,4 +89,4 @@ let fiksne_tocke premesaj tabela =
 ;;
 
 Random.self_init ();
-verjetnost_permutacij fisher_yates 50000 4
+verjetnost_permutacij fisher_yates 50000 5

@@ -22,4 +22,4 @@ let rec foldright_tree f tree acc =
                       foldright_tree f l middle)
 
 let testni = foldleft_tree (fun x y -> x + y) 0 drevo
-let testni_r = foldright_tree (fun x y -> x + y) drevo 0
+let testni_r = foldright_tree (fun x y -> x + y) drevo 0 

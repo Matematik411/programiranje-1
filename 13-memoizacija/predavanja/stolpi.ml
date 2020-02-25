@@ -1,3 +1,9 @@
+let find_opt hashtbl x =
+    try
+        Some (Hashtbl.find hashtbl x)
+    with
+        Not_found -> None
+
 let rec rdeci = function
   | 0 -> 1
   | n when n < 0 -> 0
@@ -11,13 +17,14 @@ and modri = function
 let stolpi = function
   | 0 -> 1
   | n -> rdeci n + modri n
+
 open Format
 let odviti_rdeci _ m = function
   | 0 -> 1
   | n when n < 0 -> 0
   | n -> printf "R%d-" n; m (n - 1) + m (n - 2)
 
-let odviti_modri rdeci _ = function
+let odviti_modri r _ = function
   | 0 -> 1
   | n when n < 0 -> 0
   | n -> printf "M%d-" n; r (n - 2) + r (n - 3)
