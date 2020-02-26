@@ -4,10 +4,10 @@ let kvadrat x =
   y
 
 let find_opt hashtbl x =
-    try
-        Some (Hashtbl.find hashtbl x)
-    with
-        Not_found -> None
+  try
+    Some (Hashtbl.find hashtbl x)
+  with
+    Not_found -> None
 
 let memoiziraj f =
   let rezultati = Hashtbl.create 512 in
