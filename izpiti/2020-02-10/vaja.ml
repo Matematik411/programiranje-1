@@ -23,3 +23,9 @@ let rec foldright_tree f tree acc =
 
 let testni = foldleft_tree (fun x y -> x + y) 0 drevo
 let testni_r = foldright_tree (fun x y -> x + y) drevo 0 
+
+
+type 'a spr = {mutable delec : 'a}
+let spr x = {delec = x}
+
+let c = spr 10

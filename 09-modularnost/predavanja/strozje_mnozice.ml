@@ -221,7 +221,7 @@ end
 (* module M = MnozicaSeznami(CelaStevila) *)
 (* module M = MnozicaDrevesa(CelaStevila) *)
 (* module M = MnozicaNeumnaAVLDrevesa(CelaStevila) *)
-module M = MnozicaAVLDrevesa(CelaStevila)
+module M = MnozicaAVLDrevesa(CelaStevila) 
 
 let stevilo_razlicnih xs =
   let rec aux ze_videni = function
@@ -243,13 +243,13 @@ let stopaj f x =
 (* let primer = nakljucni_seznam 10000 10000 *)
 let primer = seznam_zaporednih 10000
 
-let n = stopaj stevilo_razlicnih primer
+(* let n = stopaj stevilo_razlicnih primer *)
 
 ;;
-
+(* 
 Random.self_init ();
 nakljucni_seznam 5000 5000
 (* seznam_zaporednih 5000 *)
 |> stopaj stevilo_razlicnih
 |> string_of_int
-|> print_endline
+|> print_endline *)

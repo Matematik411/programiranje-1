@@ -23,7 +23,7 @@ dolzina ((x :: xs) @ ys) = (2)
 QED
 
 
-3. xs @ [] xs
+3. xs @ [] = xs
 -------------
 z indukcijo na xs
 
