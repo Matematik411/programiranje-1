@@ -200,3 +200,39 @@ let tester_array our_sort len =
   Array.to_list test_array = List.sort compare test
 
 
+(* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *)
+(* bubble urejanje *)
+
+let bubble_sort_array a =
+  let d = Array.length a
+  in
+  let rec push_biggest = function
+    | 0 -> ()
+    | k ->  (let () = 
+              (for i = 0 to (k-2) do 
+              (if a.(i) > a.(i+1) then swap a i (i+1))
+            done)
+            in
+            push_biggest (k-1))
+  in
+  push_biggest (d)
+
+let aaa = [|1;3;4;2;3;12;9|]
+
+
+let bubble_Pustoslemsek a = 
+  let n = Array.length a
+  in
+  for i = (n-1) downto 0 do  (* tle si mel indekse narobe, da je vrglo index out of bounds *)
+    let r = ref 0
+    in 
+    while !r < i do
+      if a.(!r) > a.(!r + 1) then swap a !r (!r+1);
+      r := !r + 1  (* ref se pa spreminja z := *)
+    done
+  done
+
+
+
+
+
