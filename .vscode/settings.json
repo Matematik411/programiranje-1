@@ -3,5 +3,8 @@
         "*.tpl": "html",
         "*.master": "html"
       },
-    "editor.wordWrap": "on"
+    "editor.wordWrap": "on",
+    "ocaml.sandbox": {
+      "kind": "global"
+    }
 }

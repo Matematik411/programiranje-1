@@ -3,6 +3,7 @@ let pozdravi = function
   | "Filip" | "Žiga" -> "Oj!"
   | "" -> "Živjo!"
   | "*" -> "Dober dan!"
+  | _ -> "Pozdravljen!"
 
 let rec fakulteta = function
   | 0 -> 1
@@ -35,3 +36,17 @@ let rec skalarni_produkt xs ys =
   match (xs, ys) with
   | ([], []) -> 0.
   | (x :: xs', y :: ys') -> x *. y +. skalarni_produkt xs' ys'
+  | _ -> failwith "Seznama morata biti enake dolžine"
+
+let () =
+  print_endline (pozdravi "Matija");
+  print_endline (pozdravi "Filip");
+  print_endline (pozdravi "");
+  print_endline (pozdravi "*");
+  Printf.printf "Fakulteta 5: %d\n" (fakulteta 5);
+  Printf.printf "Hitri fib 7: %d\n" (hitri_fib 7);
+  let (a, b) = moj_nabor 2 in Printf.printf "Moj nabor: (%d, %b)\n" a b;
+  Printf.printf "Razdalja: %.2f\n" (razdalja (0.,0.) (3.,4.));
+  Printf.printf "Dolzina: %d\n" (dolzina [1;2;3;4]);
+  Printf.printf "Vsota: %d\n" (vsota [1;2;3;4]);
+  Printf.printf "Skalarni produkt: %.2f\n" (skalarni_produkt [1.;2.;3.] [4.;5.;6.])
