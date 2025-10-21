@@ -122,7 +122,7 @@ let intbool_reverse ibs =
  vrednosti. Funkcija je repno rekurzivna in ohranja vrstni red elementov.
 [*----------------------------------------------------------------------------*)
 
-let rec intbool_separate ibs =
+let rec intbool_separate (ibs: intbool_list) : int list * bool list =
   let rec aux iacc bacc = function
   | Tail -> (iacc, bacc)
   | IntEl (i, rest) -> aux (i :: iacc) bacc rest
@@ -237,3 +237,49 @@ let find_candidate magic specialisation wizard_list =
 let primer_carovniki_3 =
   find_candidate Frost Researcher [professor; jaina]
 (* val primer_carovniki_3 : string option = Some "Jaina" *)
+
+
+
+(*----------------------------------------------------------------------------*
+  Primer za dvojiška drevesa.
+[*----------------------------------------------------------------------------*)
+type 'a drevo =
+  | Prazno
+  | Sestavljeno of 'a drevo * 'a * 'a drevo
+
+let rec dodaj x = function
+  | Prazno -> Sestavljeno (Prazno, x, Prazno)
+  | Sestavljeno (levo, y, desno) ->
+      if x < y then
+        Sestavljeno (dodaj x levo, y, desno)
+      else if x > y then
+        Sestavljeno (levo, y, dodaj x desno)
+      else
+        Sestavljeno (levo, y, desno)
+
+
+let izpisi (drevo: 'a drevo) : 'a list =
+  let rec aux acc = function
+    | Prazno -> acc
+    | Sestavljeno (levo, x, desno) ->
+        aux (x :: aux acc desno) levo
+  in
+  aux [] drevo
+
+
+let uredi_seznam sez =
+  let rec aux drevo = function
+    | [] -> drevo
+    | x :: xs -> aux (dodaj x drevo) xs
+  in
+  izpisi (aux Prazno sez)
+
+let uredi_seznam' sez =
+  sez |> List.fold_left (fun drevo x -> dodaj x drevo) Prazno |> izpisi
+
+let uredi_seznam'' sez =
+  List.fold_right dodaj sez Prazno |> izpisi
+
+let primer_drevo = uredi_seznam [5;3;8;1;4;7;9;2;6]
+let primer_drevo' = uredi_seznam' [5;3;8;1;4;7;9;2;6]
+let primer_drevo'' = uredi_seznam'' [5;3;8;1;4;7;9;2;6]
