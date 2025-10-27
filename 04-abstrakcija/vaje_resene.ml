@@ -26,6 +26,7 @@ module type NAT = sig
   val ( ** ) : t -> t -> t
   val to_int : t -> int
   val of_int : int -> t
+  val to_str : t -> string
 end
 
 (*----------------------------------------------------------------------------*
@@ -47,6 +48,7 @@ module Nat_int : NAT = struct
   let ( ** ) = ( * )
   let to_int x = x 
   let of_int x = x 
+  let to_str x = "[Nat_int]: " ^ (string_of_int x)
 
 end
 
@@ -114,6 +116,12 @@ module Nat_peano : NAT = struct
     | 0 -> Zero
     | m -> Succ (of_int (Int.sub m 1))
 
+  let to_str n =
+    let aux = function
+      | Zero -> "Zero"
+      | Succ m -> "Succ(-" ^ string_of_int ((to_int m)+1) ^ "-(Zero)--)"
+    in
+    "[Nat_peano]: " ^ aux n
 end
 
 (*----------------------------------------------------------------------------*
@@ -132,26 +140,72 @@ end
  `Nat`.
 [*----------------------------------------------------------------------------*)
 
-let sum_nat_100_peano =
-  let module Nat = Nat_peano in
-  let rec sum_to acc m = 
-    if (Nat.eq m Nat.zero) 
-      then acc
-      else sum_to (Nat.( ++ ) acc m) (Nat.( -- ) m Nat.one)
-  in
-  sum_to Nat.zero (Nat.of_int 100) |> Nat.to_int
+module Calculations (N: NAT) = struct
+  let sum_100 =
+    let rec sum_first n = 
+      if n = N.zero then N.zero
+      else N.( ++ ) n (sum_first (N.( -- ) n N.one))
+    in
+    sum_first (N.of_int 100)
 
-let sum_nat_100_int =
-  let module Nat = Nat_int in
-  let rec sum_to acc m = 
-    if (Nat.eq m Nat.zero) 
-      then acc
-      else sum_to (Nat.( ++ ) acc m) (Nat.( -- ) m Nat.one)
-  in
-  sum_to Nat.zero (Nat.of_int 100) |> Nat.to_int
+end
+
+
+module Calculations_int = Calculations (Nat_int)
+let sum_nat_100_int = 
+  Calculations_int.sum_100 |> Nat_int.to_int
+
+module Calculations_peano = Calculations (Nat_peano)
+let sum_nat_100_peano = 
+  Calculations_peano.sum_100 |> Nat_peano.to_int
 
 (* val sum_nat_100_peano : int = 5050 *)
 (* val sum_nat_100_int : int = 5050 *)
+
+
+module NatPair (A: NAT) (B: NAT) : NAT = struct
+  type t = A.t * B.t
+
+  let eq (x1, y1) (x2, y2) = A.eq x1 x2 && B.eq y1 y2
+  let zero = (A.zero, B.zero)
+  let one = (A.one, B.one)
+  let ( ++ ) (x1, y1) (x2, y2) = (A.( ++ ) x1 x2, B.( ++ ) y1 y2)
+  let ( -- ) (x1, y1) (x2, y2) = (A.( -- ) x1 x2, B.( -- ) y1 y2)
+  let ( ** ) (x1, y1) (x2, y2) = (A.( ** ) x1 x2, B.( ** ) y1 y2)
+  let to_int (a, b) = A.to_int a + B.to_int b
+  let of_int n =
+    let half = n / 2 in
+    (A.of_int half, B.of_int (n - half))
+  let to_str (a, b) =
+    "[NatPair]: ( " ^ A.to_str a ^ ", " ^ B.to_str b ^ " )"
+  end
+(* Cantor pairing functions *)
+(* let to_int (a, b) =
+  let x = A.to_int a in
+  let y = B.to_int b in
+  let s = x + y in
+  (s * (s + 1)) / 2 + y *)
+
+(* Cantor unpairing *)
+(* let of_int n =
+  let w = int_of_float ((sqrt (8. *. float_of_int n +. 1.) -. 1.) /. 2.) in
+  let t = (w * (w + 1)) / 2 in
+  let y = n - t in
+  let x = w - y in
+  (A.of_int x, B.of_int y) *)
+
+module NatPair_int_peano = NatPair (Nat_int) (Nat_peano)
+let primerPair = 
+  let open NatPair_int_peano in
+  let a = of_int 5 in
+  let b = of_int 10 in
+  let c = (a ++ b) in
+  let () = Printf.printf "Pair a: %s\n" (to_str a) in
+  let () = Printf.printf "Pair b: %s\n" (to_str b) in
+  let () = Printf.printf "Pair c (a + b): %s\n" (to_str c) in
+  let () = Printf.printf "Pair c as int: %d\n" (to_int c) in
+  ()
+
 
 (*----------------------------------------------------------------------------*
  ## Kompleksna števila
@@ -274,6 +328,7 @@ module Polar : COMPLEX = struct
   let eq x y = x = y
   let neg x = { x with arg = normalize_arg (x.arg +. pi) }
   let conj x = { x with arg = (2. *. pi) -. x.arg}
+  (* close enough *)
   let ( ++ ) x y = 
     let re_x = x.magn *. cos x.arg in
     let im_x = x.magn *. sin x.arg in
