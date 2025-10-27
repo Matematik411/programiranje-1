@@ -140,30 +140,45 @@ end
  `Nat`.
 [*----------------------------------------------------------------------------*)
 
-module Calculations (N: NAT) = struct
+module type CALC = sig
+  type t
+
+  val sum_100 : t
+  val factorial : t -> t
+end
+
+module Calculations (N: NAT) : CALC with type t := N.t = struct
+
   let sum_100 =
     let rec sum_first n = 
-      if n = N.zero then N.zero
+      if N.eq n N.zero then N.zero
       else N.( ++ ) n (sum_first (N.( -- ) n N.one))
     in
     sum_first (N.of_int 100)
-
+  
+  let rec factorial n = 
+    if N.eq n N.zero then N.one
+    else N.( ** ) n (factorial (N.( -- ) n N.one))
 end
 
 
 module Calculations_int = Calculations (Nat_int)
 let sum_nat_100_int = 
   Calculations_int.sum_100 |> Nat_int.to_int
+let factorial_5_int = 
+  Calculations_int.factorial (Nat_int.of_int 5) |> Nat_int.to_int
 
 module Calculations_peano = Calculations (Nat_peano)
 let sum_nat_100_peano = 
   Calculations_peano.sum_100 |> Nat_peano.to_int
+let factorial_5_peano =
+  Calculations_peano.factorial (Nat_peano.of_int 5) |> Nat_peano.to_int
 
 (* val sum_nat_100_peano : int = 5050 *)
 (* val sum_nat_100_int : int = 5050 *)
 
 
-module NatPair (A: NAT) (B: NAT) : NAT = struct
+module Nat_pair (A: NAT) (B: NAT) : NAT = struct
   type t = A.t * B.t
 
   let eq (x1, y1) (x2, y2) = A.eq x1 x2 && B.eq y1 y2
@@ -178,7 +193,7 @@ module NatPair (A: NAT) (B: NAT) : NAT = struct
     (A.of_int half, B.of_int (n - half))
   let to_str (a, b) =
     "[NatPair]: ( " ^ A.to_str a ^ ", " ^ B.to_str b ^ " )"
-  end
+end
 (* Cantor pairing functions *)
 (* let to_int (a, b) =
   let x = A.to_int a in
@@ -194,7 +209,7 @@ module NatPair (A: NAT) (B: NAT) : NAT = struct
   let x = w - y in
   (A.of_int x, B.of_int y) *)
 
-module NatPair_int_peano = NatPair (Nat_int) (Nat_peano)
+module NatPair_int_peano = Nat_pair (Nat_int) (Nat_peano)
 let primerPair = 
   let open NatPair_int_peano in
   let a = of_int 5 in
