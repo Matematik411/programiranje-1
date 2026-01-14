@@ -104,17 +104,16 @@ def cache_zabica(mocvara):
 
     @cache
     def pomozna(pozicija, energija):
-        if pozicija >= n:
-            return 0
-        energija += mocvara[pozicija]
+        if pozicija + energija >= n:
+            return 1
         
         najmanj_skokov = n
         for skok in range(1, energija + 1):
             nova_pozicija = pozicija + skok
-            nova_energija = energija - skok
+            nova_energija = energija - skok + mocvara[nova_pozicija]
 
-            skoki = pomozna(nova_pozicija, nova_energija)
-            najmanj_skokov = min(najmanj_skokov, skoki + 1)
+            skoki = pomozna(nova_pozicija, nova_energija) + 1
+            najmanj_skokov = min(najmanj_skokov, skoki)
         
         return najmanj_skokov
 
@@ -147,6 +146,8 @@ print(cache_zabica([4, 1, 8, 2, 11, 1, 1, 1, 1, 1]))
 def nageljni(n, m, l):
     if m == 0:
         return [[0] * n]
+    if m == 1 and n == l:
+        return [[1] * n]
     if n < m * l + (m - 1):
         return []
 
@@ -228,6 +229,7 @@ def pobeg(mesta):
         return najkrajsa_pot
 
     return pomozna(0, 0)
+
 print(pobeg([[(1, 10), (3, -10)],
             [(2, 10), (5, -20)],
             [(3, -10)],
