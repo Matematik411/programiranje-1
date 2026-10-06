@@ -23,3 +23,5 @@ node_modules
 *.bc.js
 
 99-asistent/
+# Zasebne datoteke (osnutki, priprave, zapiski, ipd.)
+99-zasebno/
