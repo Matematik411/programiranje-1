@@ -53,8 +53,10 @@ RUN jupyter kernelspec install --name ocaml-jupyter "$(opam var share)/jupyter" 
 
 # Install elan (Lean version manager)
 RUN curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf \
-    | sh -s -- --default-toolchain leanprover/lean4:stable -y
+    | sh -s -- --default-toolchain leanprover/lean4:v4.34.1 -y
 ENV PATH="/home/opam/.elan/bin:${PATH}"
+# install elan explicitly
+RUN elan toolchain install leanprover/lean4:v4.34.1
 
 # We remove the dummy .gitconfig file, included in the OCaml Docker image, allowing VS Code to replace it
 # with the much more useful local version.
