@@ -11,8 +11,8 @@
  predstavljen s seznamom števil s plavajočo vejico, pomnoži z danim skalarjem.
 [*----------------------------------------------------------------------------*)
 
-let razteg1 u v = List.map (fun x -> u *. x) v
-let razteg u v = List.map (( *. ) u) v
+let razteg u v = List.map (fun x -> u *. x) v
+let razteg1 u v = List.map ( ( *. ) u) v
 
 let primer_vektorji_1 = razteg 2.0 [1.0; 2.0; 3.0]
 (* val primer_vektorji_1 : float list = [2.; 4.; 6.] *)
@@ -23,6 +23,7 @@ let primer_vektorji_1 = razteg 2.0 [1.0; 2.0; 3.0]
 [*----------------------------------------------------------------------------*)
 
 let sestej u v = List.map2 (fun x y -> x +. y) u v
+let sestej1 u v = List.map2 ( ( +. ) ) u v
 
 let primer_vektorji_2 = sestej [1.0; 2.0; 3.0] [4.0; 5.0; 6.0]
 (* val primer_vektorji_2 : float list = [5.; 7.; 9.] *)
@@ -37,8 +38,12 @@ let primer_vektorji_2 = sestej [1.0; 2.0; 3.0] [4.0; 5.0; 6.0]
 let vsota_seznama = List.fold_left (+.) 0.
 
 let skalarni_produkt u v = vsota_seznama (
-  List.map2 (( *.)) u v
+  List.map2 ( ( *. ) ) u v
 )
+
+let skalarni_produkt_verizno u v = 
+  List.map2 ( ( *. ) ) u v
+  |> vsota_seznama
 
 let primer_vektorji_3 = skalarni_produkt [1.0; 2.0; 3.0] [4.0; 5.0; 6.0]
 (* val primer_vektorji_3 : float = 32. *)
@@ -111,18 +116,15 @@ let primer_html_1 = ovij "h1" "Hello, world!"
  ustrezno število presledkov.
 [*----------------------------------------------------------------------------*)
 
-let zamakni k s = 
+let zamakni k niz = 
   let presledki = String.make k ' ' in
-  let vrstice = String.split_on_char '\n' s in
+  let vrstice = String.split_on_char '\n' niz in
   let zamaknjene_vrstice = List.map ((^) presledki) vrstice in
   String.concat "\n" zamaknjene_vrstice
 
 let zamakni_verizno k besedilo = 
-  let whitespace = String.make k ' ' 
-    in
-  besedilo 
-  |> String.split_on_char '\n'
-  |> List.map (fun vrstica -> whitespace ^ vrstica)
+  String.split_on_char '\n' besedilo
+  |> List.map (fun vrstica -> (String.make k ' ') ^ vrstica)
   |> String.concat "\n"
 
 let primer_html_2 = zamakni 4 "Hello,\nworld!"
@@ -162,16 +164,9 @@ let primer_html_3 = ul ["ananas"; "banana"; "čokolada"]
  Napišite funkcijo `razdeli_vrstico : string -> string * string`, ki sprejme
  niz, ki vsebuje vejico, loči na del pred in del za njo.
 [*----------------------------------------------------------------------------*)
-let list_to_tuple2 = function
-  | [a; b] -> (a, b)
-  | _ -> failwith "prevec elementov"
+
+
 let razdeli_vrstico s = 
-  String.split_on_char ',' s
-  |> List.map (String.trim) 
-  |> list_to_tuple2
-
-
-let razdeli_vrstico_s s = 
   let vejica = String.index s ',' in
   let levi = String.sub s 0 vejica in
   let desni = String.sub s (vejica + 2) ((String.length s) - vejica - 2) in
@@ -179,7 +174,6 @@ let razdeli_vrstico_s s =
 
 
 let primer_seznam_1 = razdeli_vrstico "mleko, 2"
-let primer_seznam_1s = razdeli_vrstico_s "mleko, 2"
 (* val primer_seznam_1 : string * string = ("mleko", "2") *)
 
 (*----------------------------------------------------------------------------*
@@ -216,6 +210,25 @@ let primer_seznam_3 =
  znesek nakupa.
 [*----------------------------------------------------------------------------*)
 
+let izracunaj_skupni_znesek nakup cenik = 
+  let urejen_seznam =
+    pretvori_v_seznam_parov nakup
+    |> pretvori_druge_komponente Float.of_string 
+  in
+  let urejen_cenik =
+    pretvori_v_seznam_parov cenik
+    |> pretvori_druge_komponente Float.of_string
+  in
+  let cena_izdelka izdelek =
+    List.map ((fun (i1, p1) (i2, p2) -> if i1 = i2 then p1 *. p2 else 0.) (fst izdelek, snd izdelek)) urejen_cenik
+    |> vsota_seznama
+  in
+  urejen_seznam
+  |> List.map cena_izdelka
+  |> vsota_seznama
+
+
+(* Resimo lahko tudi z uporabo delnih vrednosti (option type) *)
 let izracunaj_skupni_znesek_opt cenik seznam =
   let urejen_cenik = 
     pretvori_v_seznam_parov cenik 
@@ -234,48 +247,7 @@ let izracunaj_skupni_znesek_opt cenik seznam =
     urejen_seznam
   |> vsota_seznama
 
-let izracunaj_skupni_znesek_opt_razpisano cenik seznam =
-  let urejen_cenik = 
-    pretvori_v_seznam_parov cenik 
-    |> pretvori_druge_komponente float_of_string
-  in
-  let urejen_seznam = 
-    pretvori_v_seznam_parov seznam
-    |> pretvori_druge_komponente float_of_string
-  in 
-  let placilo_izdelka izdelek kolicina =
-    List.find_map 
-        (fun (izd_c, cena) -> if izdelek = izd_c then Some (cena *. kolicina) else None)
-        urejen_cenik
-  in
-  List.filter_map 
-    (fun (izdelek, kolicina) -> placilo_izdelka izdelek kolicina)
-    urejen_seznam
-  |> vsota_seznama
-    
-let izracunaj_skupni_znesek nakup cenik = 
-  let nakup_seznam =
-    pretvori_v_seznam_parov nakup
-    |> pretvori_druge_komponente Float.of_string 
-  in
-  let cenik_seznam =
-    pretvori_v_seznam_parov cenik
-    |> pretvori_druge_komponente Float.of_string
-  in
-  let cena_izdelka izdelek =
-    List.map ((fun (i1, p1) (i2, p2) -> if i1 = i2 then p1 *. p2 else 0.) (fst izdelek, snd izdelek)) cenik_seznam
-    |> vsota_seznama
-  in
-  nakup_seznam
-  |> List.map cena_izdelka
-  |> vsota_seznama
-
-
 let primer_seznam_4 = 
-  let nakupovalni_seznam = "mleko, 2\njabolka, 5"
-  and cenik = "jabolka, 0.5\nkruh, 2\nmleko, 1.5" in
-  izracunaj_skupni_znesek cenik nakupovalni_seznam
-let primer_seznam_4_opt = 
   let nakupovalni_seznam = "mleko, 2\njabolka, 5"
   and cenik = "jabolka, 0.5\nkruh, 2\nmleko, 1.5" in
   izracunaj_skupni_znesek cenik nakupovalni_seznam
