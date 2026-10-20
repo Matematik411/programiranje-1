@@ -17,7 +17,15 @@
  rekurzivna.
 [*----------------------------------------------------------------------------*)
 
-let reverse _ = ()
+let rec reverse sez = 
+  match sez with
+    | [] -> []
+    | x :: xs -> (reverse xs) @ [x]
+    
+let rec reverse2 = function
+  | [] -> []
+  | x :: xs -> (reverse xs) @ [x]
+    
 
 (*----------------------------------------------------------------------------*
  ## Funkcija `repeat`
@@ -28,7 +36,13 @@ let reverse _ = ()
   vrednosti `n` funkcija vrne prazen seznam.
 [*----------------------------------------------------------------------------*)
 
-let rec repeat _ _ = ()
+let rec repeat x n = 
+  if n <= 0 then [] else x :: (repeat x (n-1))
+
+let rec repeat2 x n = 
+  match n with
+    | n when n <= 0 -> []
+    | n -> x :: (repeat x (n-1))
 
 let primer_repeat_1 = repeat "A" 5
 (* val primer_repeat_1 : string list = ["A"; "A"; "A"; "A"; "A"] *)
@@ -47,7 +61,16 @@ let primer_repeat_2 = repeat "A" (-2)
  funkcije `List.init`.
 [*----------------------------------------------------------------------------*)
 
-let range _ = ()
+let rec range = function
+  | n when n < 0 -> []
+  | n -> (range (n - 1)) @ [n]
+
+let range_tr n =
+  let rec aux acc = function
+    | m when m < 0 -> acc
+    | m -> aux (m :: acc) (n - 1)
+  in
+  aux [] n
 
 let primer_range = range 10
 (* val primer_range : int list = [0; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10] *)
@@ -116,8 +139,14 @@ let primer_mapi = mapi (+) [0; 0; 0; 2; 2; 2]
  Pri tem ne smete uporabiti vgrajene funkcije `List.combine`.
 [*----------------------------------------------------------------------------*)
 
-let rec zip _ _ = ()
-
+let rec zip s1 s2 = 
+  let rec aux acc argument =
+    match argument with
+    | ([], []) -> List.rev acc
+    | (x :: xs, y :: ys) -> aux ( (x, y) :: acc) (xs, ys)
+    | (_, _) -> failwith "razlicne dolzine"
+  in
+  aux [] (s1, s2)
 let primer_zip_1 = zip [1; 1; 1; 1] [0; 1; 2; 3]
 (* val primer_zip_1 : (int * int) list = [(1, 0); (1, 1); (1, 2); (1, 3)] *)
 
@@ -133,7 +162,12 @@ let primer_zip_1 = zip [1; 1; 1; 1] [0; 1; 2; 3]
   Pri tem ne smete uporabiti vgrajene funkcije `List.split`.
 [*----------------------------------------------------------------------------*)
 
-let rec unzip _ = ()
+let rec unzip sez = 
+  match sez with
+  | [] -> [], []
+  | (x,y) :: rest -> 
+      let (levi, desni) = unzip rest in
+      (x :: levi, y :: desni)
 
 let primer_unzip_1 = unzip [(0,"a"); (1,"b"); (2,"c")]
 (* val primer_unzip_1 : int list * string list = ([0; 1; 2], ["a"; "b"; "c"]) *)

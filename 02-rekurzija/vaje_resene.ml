@@ -1,5 +1,5 @@
 (*----------------------------------------------------------------------------*
- # Rekurzija
+ # Vzorci in rekurzija
 [*----------------------------------------------------------------------------*)
 
 (*----------------------------------------------------------------------------*
@@ -38,7 +38,7 @@ let rec repeat x n =
     | n when n <= 0 -> []
     | n -> x :: (repeat x (n-1))
 
-let repeat_tr x =
+let repeat_tlrec x =
   let rec aux acc = function
     | n when n <= 0 -> acc
     | n -> aux (x :: acc) (n-1)
@@ -46,11 +46,11 @@ let repeat_tr x =
   aux [] 
 
 let primer_repeat_1 = repeat "A" 5
-let primer_repeat_1_tr = repeat_tr "A" 5
+let primer_repeat_1_tlrec = repeat_tlrec "A" 5
 (* val primer_repeat_1 : string list = ["A"; "A"; "A"; "A"; "A"] *)
 
 let primer_repeat_2 = repeat "A" (-2)
-let primer_repeat_2_tr = repeat_tr "A" (-2)
+let primer_repeat_2_tlrec = repeat_tlrec "A" (-2)
 (* val primer_repeat_2 : string list = [] *)
 
 (*----------------------------------------------------------------------------*
@@ -68,7 +68,7 @@ let rec range = function
   | n when n < 0 -> []
   | n -> (range (n - 1)) @ [n]
 
-let range_tr =
+let range_tlrec =
   let rec aux acc = function
     | n when n < 0 -> acc
     | n -> aux (n :: acc) (n - 1)
@@ -76,7 +76,7 @@ let range_tr =
   aux []
 
 let primer_range = range 10
-let primer_range_tr = range_tr 10
+let primer_range_tlrec = range_tlrec 10
 (* val primer_range : int list = [0; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10] *)
 
 (*----------------------------------------------------------------------------*
@@ -265,7 +265,7 @@ let rec apply_sequence f x = function
   | n -> x :: (apply_sequence f (f x) (n - 1))
 
 
-let apply_sequence_tr f x = 
+let apply_sequence_tlrec f x = 
   let rec aux acc c = function
     | n when n < 0 -> reverse acc
     | n -> aux (c :: acc) (f c) (n - 1)
@@ -273,11 +273,11 @@ let apply_sequence_tr f x =
   aux [] x 
 
 let primer_apply_sequence_1 = apply_sequence (fun x -> x * x) 2 5
-let primer_apply_sequence_1_tr = apply_sequence_tr (fun x -> x * x) 2 5
+let primer_apply_sequence_1_tlrec = apply_sequence_tlrec (fun x -> x * x) 2 5
 (* val primer_apply_sequence_1 : int list = [2; 4; 16; 256; 65536; 4294967296] *)
 
 let primer_apply_sequence_2 = apply_sequence (fun x -> x * x) 2 (-5)
-let primer_apply_sequence_2_tr = apply_sequence_tr (fun x -> x * x) 2 (-5)
+let primer_apply_sequence_2_tlrec = apply_sequence_tlrec (fun x -> x * x) 2 (-5)
 (* val primer_apply_sequence_2 : int list = [] *)
 
 (*----------------------------------------------------------------------------*
@@ -295,7 +295,7 @@ let rec filter f = function
   | x :: xs when f x -> x :: (filter f xs)
   | x :: xs -> filter f xs
   
-let filter_tr f =
+let filter_tlrec f =
   let rec aux acc = function
     | [] -> reverse acc
     | x :: xs when f x -> aux (x :: acc) xs
@@ -304,7 +304,7 @@ let filter_tr f =
   aux [] 
 
 let primer_filter = filter ((<)3) [0; 1; 2; 3; 4; 5]
-let primer_filter_tr = filter_tr ((<)3) [0; 1; 2; 3; 4; 5]
+let primer_filter_tlrec = filter_tlrec ((<)3) [0; 1; 2; 3; 4; 5]
 (* val primer_filter : int list = [4; 5] *)
 
 (*----------------------------------------------------------------------------*
