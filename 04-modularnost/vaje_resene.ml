@@ -150,10 +150,10 @@ module Nat_calculations (N: NAT) : CALC with type t := N.t = struct
   let rec factorial n =
     if N.eq n N.zero then N.one
     else N.( ** ) n (factorial (N.(--) n N.one))
+  
     
-    open N
-
-    let sum_100 = 
+  open N
+  let sum_100 = 
     let rec sum_first n = 
       if eq n zero then zero
       else n ++ (sum_first (n -- one))
