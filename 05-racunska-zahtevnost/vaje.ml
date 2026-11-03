@@ -114,7 +114,8 @@ let primer_selection_sort_array =
  števili med 0 (vključno) in `max` (izključno).
 [*----------------------------------------------------------------------------*)
 
-let randlist _ _ = ()
+let rec randlist len max =
+  if len <= 0 then [] else Random.int max :: randlist (len - 1) max
 
 let primer_randlist = randlist 10 10
 (* val primer_randlist : int list = [0; 1; 0; 4; 0; 9; 1; 2; 5; 4] *)
