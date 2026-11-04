@@ -96,6 +96,18 @@ let selection_sort_at s =
 
 let primer_selection_sort_at = selection_sort_at [3; 2; 5; 9; 1; 7; 4; 3]
 (* val primer_selection_sort_at : int list = [1; 2; 3; 3; 4; 5; 7; 9] *)
+
+let rec reverse = function (* O(n^2) *)
+  | [] -> []
+  | x :: xs -> reverse xs @ [x]
+
+let reverse list = (* O(n) *)
+  let rec aux acc = function
+    | [] -> acc
+    | x :: xs -> aux (x :: acc) xs
+  in aux [] list
+
+
 (*----------------------------------------------------------------------------*
  ## Urejanje z izbiranjem na tabelah
 
