@@ -10,12 +10,14 @@
  poddrevesi. Na tej točki ne predpostavljamo ničesar drugega o obliki dreves.
 [*----------------------------------------------------------------------------*)
 
-type 'a tree = Empty | Node of 'a tree * 'a * 'a tree
+type 'a tree = 
+  | Empty 
+  | Node of 'a tree * 'a * 'a tree
 
 (*----------------------------------------------------------------------------*
- Definirajmo si testni primer za preizkušanje funkcij v nadaljevanju. Testni
- primer predstavlja spodaj narisano drevo, pomagamo pa si s pomožno funkcijo
- `leaf`, ki iz podatka zgradi list.
+ Definirajte testni primer `test_tree` za preizkušanje funkcij v nadaljevanju.
+ Testni primer naj predstavlja spodaj narisano drevo, pomagate pa si lahko s
+ pomožno funkcijo `leaf`, ki iz podatka zgradi list.
 
           5
          / \
@@ -26,7 +28,7 @@ type 'a tree = Empty | Node of 'a tree * 'a * 'a tree
 
 let leaf x = Node (Empty, x, Empty)
 
-let test_tree = Node (Node (leaf 0, 2, Empty), 5, Node (leaf 6, 7, leaf 11))
+let test_tree = Empty (* Zapišite testni primer *)
 
 (*----------------------------------------------------------------------------*
  Funkcija `mirror` vrne prezrcaljeno drevo. Na primeru `test_tree` torej vrne

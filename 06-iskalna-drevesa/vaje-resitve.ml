@@ -10,12 +10,14 @@
  poddrevesi. Na tej točki ne predpostavljamo ničesar drugega o obliki dreves.
 [*----------------------------------------------------------------------------*)
 
-type 'a tree = Empty | Node of 'a tree * 'a * 'a tree
+type 'a tree = 
+  | Empty 
+  | Node of 'a tree * 'a * 'a tree
 
 (*----------------------------------------------------------------------------*
- Definirajmo si testni primer za preizkušanje funkcij v nadaljevanju. Testni
- primer predstavlja spodaj narisano drevo, pomagamo pa si s pomožno funkcijo
- `leaf`, ki iz podatka zgradi list.
+ Definirajte testni primer `test_tree` za preizkušanje funkcij v nadaljevanju.
+ Testni primer naj predstavlja spodaj narisano drevo, pomagate pa si lahko s
+ pomožno funkcijo `leaf`, ki iz podatka zgradi list.
 
           5
          / \
