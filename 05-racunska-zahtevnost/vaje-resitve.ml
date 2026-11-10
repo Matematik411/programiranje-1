@@ -288,36 +288,3 @@ let primer_izmeri = izmeri selection_sort 4_000
    padajoč: Porabljen čas: ... ms
    naključen: Porabljen čas: ... ms
    val primer_izmeri : unit = () *)
-
-(*
- [1_000; 2_000; 4_000; 8_000] |> List.iter (izmeri selection_sort);;
- [1_000; 2_000; 4_000; 8_000] |> List.iter (izmeri uredi_z_vstavljanjem);;
-
- Izmerjeni časi v milisekundah (OCaml 4.14; na vašem računalniku bodo drugačni,
- razmerja pa podobna):
-
-                    n = 1000    2000    4000    8000
-   izbiranje
-     naraščajoč          5.1    19.8    80.1   327.5
-     padajoč            11.2    46.6   191.0   760.9
-     naključen           8.5    33.1   139.7   535.9
-   vstavljanje
-     naraščajoč         0.02    0.03    0.06    0.39
-     padajoč             5.4    20.2    89.0   410.0
-     naključen           2.6    10.5    43.8   191.6
-
- Pri urejanju z izbiranjem se čas ob podvojitvi dolžine na vseh vhodih približno
- početveri, kar se ujema s časovno zahtevnostjo Θ(n^2). Posebej ugodnih vhodov
- nima, saj mora `find_min` vedno pregledati cel neurejen podseznam. Na
- padajočem seznamu je nekoliko počasnejše, ker je najmanjši element vedno na
- koncu, zato mora tudi `remove_one` pregledati cel seznam, na naraščajočem pa
- ga najde že na začetku. To spremeni le konstanto, ne pa časovne zahtevnosti.
-
- Urejanje z vstavljanjem je na padajočih in naključnih seznamih prav tako
- kvadratno, na naraščajočih pa linearno. Funkcija `uredi_z_vstavljanjem` namreč
- glavo seznama vstavi v že urejen rep. Pri naraščajočem seznamu je glava manjša
- od vseh elementov repa, zato se `vstavi` ustavi že pri prvi primerjavi. Pri
- padajočem seznamu je glava največja, zato jo mora `vstavi` prenesti na konec,
- kar je najslabši primer. Pri naključnem seznamu se `vstavi` v povprečju ustavi
- na polovici, zato je urejanje približno dvakrat hitrejše kot pri padajočem.
-*)
