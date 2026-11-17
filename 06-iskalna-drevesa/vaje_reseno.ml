@@ -32,16 +32,14 @@ let test_tree =
   Node (
     Node (
       leaf 0,
-      2,
-      Empty
-    ),
-    5,
+      2, 
+      Empty), 
+    5, 
     Node (
-      leaf 7,
-      6,
-      leaf 11
+      leaf 6, 
+      7, 
+      leaf 11)
     )
-  )
 
 (*----------------------------------------------------------------------------*
  Funkcija `mirror` vrne prezrcaljeno drevo. Na primeru `test_tree` torej vrne
@@ -100,9 +98,9 @@ let primer_map_tree = map_tree ((<) 3) test_tree
  naj bo takšen, da v primeru dvojiškega iskalnega drevesa vrne urejen seznam.
 [*----------------------------------------------------------------------------*)
 
-let rec list_of_tree = function 
+let rec list_of_tree = function
   | Empty -> []
-  | Node (l, x, r) -> (list_of_tree l) @ [x] @ (list_of_tree r)
+  | Node (l, x, r) -> list_of_tree l @ [x] @ list_of_tree r
 
 let primer_list_of_tree = list_of_tree test_tree
 (* val primer_list_of_tree : int list = [0; 2; 5; 6; 7; 11] *)
@@ -113,34 +111,34 @@ let primer_list_of_tree = list_of_tree test_tree
  torej drevo npr. ni oblike `Node (leaf 1, 1, leaf 2)`. Prazno drevo je BST.
 [*----------------------------------------------------------------------------*)
 
-let is_bst_from_list t = 
-  let rec is_list_ordered = function
-    | [] | _ :: [] -> true
-    | x :: y :: xs when x > y -> false
-    | x :: y :: xs -> is_list_ordered (y :: xs)
+let is_bst_list tree =
+  let rec is_ordered = function
+    | [] | [_] -> true
+    | x :: y :: rest -> x < y && is_ordered (y :: rest)
   in
-  list_of_tree t |> is_list_ordered
+  tree |> list_of_tree |> is_ordered
 
-let is_bst t = 
+
+let is_bst tree =
   let rec aux = function
-    | Empty -> failwith "ni mozno"
-    | Node (Empty, x, Empty) ->  (x, true, x)
-    | Node (Empty, x, r) -> 
+    | Empty -> failwith "Ne more se zgoditi"
+    | Node (Empty, x, Empty) -> (x, true, x)
+    | Node (Empty, x, r) ->
         let min_r, bst_r, max_r = aux r in
         (x, bst_r && x < min_r, max_r)
     | Node (l, x, Empty) ->
         let min_l, bst_l, max_l = aux l in
         (min_l, bst_l && max_l < x, x)
-    |Node (l, x, r) ->
+    | Node (l, x, r) ->
         let min_l, bst_l, max_l = aux l in
         let min_r, bst_r, max_r = aux r in
         (min_l, bst_l && bst_r && max_l < x && x < min_r, max_r)
   in
-  match t with
-    | Empty -> true
-    | tree -> 
-        let _, bst, _ = aux tree in
-        bst 
+  match tree with
+  | Empty -> true
+  | _ ->
+      let _, bst, _ = aux tree in
+      bst
 
 let primer_is_bst = is_bst test_tree
 (* val primer_is_bst : bool = true *)
@@ -164,12 +162,11 @@ let rec insert x = function
   | Node (l, y, r) when x < y -> Node (insert x l, y, r)
   | Node (l, y, r) when x > y -> Node (l, y, insert x r)
   | tree -> tree
-  
+
 let rec member x = function
   | Empty -> false
-  | Node (l, y, r) when x < y -> member x l
-  | Node (l, y, r) when x > y -> member x r
-  | tree -> true
+  | Node (l, y, r) ->
+      if x < y then member x l else if x > y then member x r else true
 
 let primer_insert = insert 2 (leaf 4)
 (* val primer_insert : int tree = Node (Node (Empty, 2, Empty), 4, Empty) *)
@@ -186,10 +183,17 @@ let primer_member = member 3 test_tree
 
 let rec member2 x = function
   | Empty -> false
-  | Node (l, y, r) -> (member x l) || (x = y) || (member x r)
+  | Node (l, y, r) -> x = y || member2 x l || member2 x r
 
 let primer_member2 = member2 3 test_tree
 (* val primer_member2 : bool = false *)
+
+(*
+ Funkcija `member` se spusti le po eni poti od korena proti listom, zato
+ porabi O(log n) časa. 
+ Funkcija `member2` pa mora v najslabšem primeru pregledati vsa vozlišča, 
+ kar nas stane O(n) časa.
+*)
 
 (*----------------------------------------------------------------------------*
  Funkcija `succ` vrne naslednika korena danega drevesa, če obstaja. Za drevo
@@ -198,9 +202,9 @@ let primer_member2 = member2 3 test_tree
  manjši od korena, če obstaja.
 [*----------------------------------------------------------------------------*)
 
-let succ bst = 
+let succ bst =
   let rec minimal = function
-    | Empty -> None 
+    | Empty -> None
     | Node (Empty, x, _) -> Some x
     | Node (l, _, _) -> minimal l
   in
@@ -241,10 +245,19 @@ let rec delete x = function
   | Empty -> Empty
   | Node (l, y, r) when x < y -> Node (delete x l, y, r)
   | Node (l, y, r) when x > y -> Node (l, y, delete x r)
-  | Node (l, _, r) as bst ->
+  | Node (l, _, r) as bst -> (
+      match succ bst with
+      | None -> l (* To se zgodi le, kadar je `r` prazno. *)
+      | Some s -> Node (l, s, delete s r))
+
+let rec delete_pred x = function
+  | Empty -> Empty
+  | Node (l, y, r) when x < y -> Node (delete_pred x l, y, r)
+  | Node (l, y, r) when x > y -> Node (l, y, delete_pred x r)
+  | Node (l, _, r) as bst -> (
       match pred bst with
-        | None -> r
-        | Some z -> Node (delete z l , z, r)
+      | None -> r (* To se zgodi le, kadar je `l` prazno. *)
+      | Some p -> Node (delete_pred p l, p, r))
 
 let primer_delete = delete 7 test_tree
 (* val primer_delete : int tree =
@@ -268,6 +281,7 @@ let primer_delete = delete 7 test_tree
  Nato v prazno AVL drevo dodajte še elemente 3, 1 in 2. Kaj je drugače?
 [*----------------------------------------------------------------------------*)
 
+
 (*----------------------------------------------------------------------------*
  Funkcija `is_avl` preveri, ali je drevo uravnoteženo, torej ali se v vsakem
  vozlišču višini levega in desnega poddrevesa razlikujeta za največ 1. Kakšna
@@ -280,17 +294,15 @@ let primer_delete = delete 7 test_tree
 
 let rec is_avl = function
   | Empty -> true
-  | Node (l, _, r) -> 
-      abs (height l - height r) <= 1 && is_avl l && is_avl r
+  | Node (l, _, r) -> abs (height l - height r) <= 1 && is_avl l && is_avl r
 
-let is_avl' tree = 
+let is_avl' tree =
   let rec aux = function
     | Empty -> Some 0
     | Node (l, _, r) -> (
-      match (aux l, aux r) with
+        match (aux l, aux r) with
         | Some hl, Some hr when abs (hl - hr) <= 1 -> Some (1 + max hl hr)
-        | _ -> None
-    )
+        | _ -> None)
   in
   aux tree <> None
 
@@ -316,13 +328,12 @@ let primer_is_avl_2 = is_avl (leaf 1 |> insert 2 |> insert 3)
 [*----------------------------------------------------------------------------*)
 
 let rotate_left = function
-  | Node (a, x, Node (b, y, c)) -> 
-      Node (Node (a, x, b), y, c)
-  | _ -> failwith "ni mozno"
+  | Node (a, x, Node (b, y, c)) -> Node (Node (a, x, b), y, c)
+  | _ -> failwith "Tega drevesa ne morem zavrteti"
 
 let rotate_right = function
   | Node (Node (a, x, b), y, c) -> Node (a, x, Node (b, y, c))
-  | _ -> failwith "ni mozno"
+  | _ -> failwith "Tega drevesa ne morem zavrteti"
 
 let primer_rotate_left = rotate_left test_tree
 (* val primer_rotate_left : int tree =
@@ -349,7 +360,6 @@ let primer_rotate_left_2 = list_of_tree (rotate_left test_tree)
  in z `avl_insert` preverite svojo rešitev naloge na papirju. Premislite še,
  katere primere obravnava funkcija `balance`.
 [*----------------------------------------------------------------------------*)
-
 
 let imbalance = function
   | Empty -> 0
@@ -387,7 +397,6 @@ let primer_avl_insert_2 =
     height (List.fold_left (fun tree x -> avl_insert x tree) Empty xs) )
 (* val primer_avl_insert_2 : int * int = (100, 7) *)
 
-
 (*----------------------------------------------------------------------------*
  Funkcija `avl_delete x tree` iz AVL drevesa `tree` izbriše element `x`.
  Element izbrišemo enako kot pri `delete`, le da drevo na poti nazaj
@@ -412,16 +421,42 @@ let avl_test_tree =
       7,
       Node (Empty, 8, leaf 9) )
 
-let rec avl_delete x = function
+(*
+ Po izbrisu 9 dobimo drevo
+
+          5
+        /   \
+       4     7
+      /     / \
+     2     6   8
+    / \
+   1   3
+
+ ki v vozlišču 4 ni uravnoteženo.
+*)
+
+let balance tree =
+  match tree with
+  | Node (l, _, _) when imbalance tree = 2 && imbalance l >= 0 ->
+      rotate_right tree
+  | Node (l, x, r) when imbalance tree = 2 ->
+      Node (rotate_left l, x, r) |> rotate_right
+  | Node (_, _, r) when imbalance tree = -2 && imbalance r <= 0 ->
+      rotate_left tree
+  | Node (l, x, r) when imbalance tree = -2 ->
+      Node (l, x, rotate_right r) |> rotate_left
+  | _ -> tree
+
+let rec avl_delete x tree =
+  match tree with
   | Empty -> Empty
-  | Node (l, y, r) when x < y ->
-      Node (avl_delete x l, y, r) |> balance
-  | Node (l, y, r) when x > y ->
-      Node (l, y, avl_delete x r) |> balance
-  | Node (l, _, r) as bst ->
-      match pred bst with
-        | None -> r
-        | Some z -> Node (avl_delete z l, z, r) |> balance
+  | Node (l, y, r) ->
+      if x < y then Node (avl_delete x l, y, r) |> balance
+      else if x > y then Node (l, y, avl_delete x r) |> balance
+      else (
+        match succ tree with
+        | None -> l
+        | Some s -> Node (l, s, avl_delete s r) |> balance)
 
 let primer_avl_delete = avl_delete 9 avl_test_tree
 (* val primer_avl_delete : int tree =
@@ -431,7 +466,6 @@ let primer_avl_delete = avl_delete 9 avl_test_tree
 let primer_avl_delete_2 = is_avl (avl_delete 9 avl_test_tree)
 (* val primer_avl_delete_2 : bool = true *)
 
-
 (*----------------------------------------------------------------------------*
  (Dodatna naloga) Naj bo `N(h)` najmanjše število vozlišč v AVL drevesu višine
  `h`. Najmanjše AVL drevo višine `h` je sestavljeno iz korena ter najmanjših
@@ -440,6 +474,7 @@ let primer_avl_delete_2 = is_avl (avl_delete 9 avl_test_tree)
  `N(h) >= 2^(h/2) - 1`, in od tod sklepajte, da je višina AVL drevesa z `n`
  vozlišči O(log n).
 [*----------------------------------------------------------------------------*)
+
 
 (*----------------------------------------------------------------------------*
  ## Slovarji
@@ -473,7 +508,12 @@ let test_dict : (string, int) dict =
  slovar vrednosti morda ne vsebuje, vrne `option` tip.
 [*----------------------------------------------------------------------------*)
 
-let dict_get _ _ = ()
+let rec dict_get key = function
+  | Empty -> None
+  | Node (l, (k, v), r) ->
+      if key < k then dict_get key l
+      else if key > k then dict_get key r
+      else Some v
 
 let primer_dict_get = dict_get "banana" test_dict
 (* val primer_dict_get : int option = None *)
@@ -491,7 +531,14 @@ let primer_dict_get_2 = dict_get "c" test_dict
  parametra za tip ključev in vrednosti v primerjavi s tipom `dict_get`.
 [*----------------------------------------------------------------------------*)
 
-let print_dict _ = ()
+let rec print_dict = function
+  | Empty -> ()
+  | Node (l, (k, v), r) ->
+      print_dict l;
+      print_string (k ^ " : ");
+      print_int v;
+      print_newline ();
+      print_dict r
 
 let primer_print_dict = print_dict test_dict
 (* a : 0
@@ -505,7 +552,12 @@ let primer_print_dict = print_dict test_dict
  vrednost `value`. Če za nek ključ vrednost že obstaja, jo zamenja.
 [*----------------------------------------------------------------------------*)
 
-let dict_insert _ _ _ = ()
+let rec dict_insert key value = function
+  | Empty -> leaf (key, value)
+  | Node (l, (k, v), r) ->
+      if key < k then Node (dict_insert key value l, (k, v), r)
+      else if key > k then Node (l, (k, v), dict_insert key value r)
+      else Node (l, (key, value), r)
 
 let primer_dict_insert = dict_insert "1" 14 test_dict |> print_dict
 (* 1 : 14
@@ -533,14 +585,18 @@ module type DICT = sig
   type ('key, 'value) t
 
   val empty : ('key, 'value) t
-  (* Dodajte manjkajoče! *)
+  val get : 'key -> ('key, 'value) t -> 'value option
+  val insert : 'key -> 'value -> ('key, 'value) t -> ('key, 'value) t
+  val print : (string, int) t -> unit
 end
 
 module Tree_dict : DICT = struct
   type ('key, 'value) t = ('key, 'value) dict
 
   let empty = Empty
-  (* Dodajte manjkajoče! *)
+  let get = dict_get
+  let insert = dict_insert
+  let print = print_dict
 end
 
 (*----------------------------------------------------------------------------*
@@ -551,7 +607,14 @@ end
 [*----------------------------------------------------------------------------*)
 
 module Count (D : DICT) = struct
-  let count _ = ()
+  let count list =
+    let rec aux dict = function
+      | [] -> D.print dict
+      | x :: xs ->
+          let n = match D.get x dict with None -> 0 | Some n -> n in
+          aux (D.insert x (n + 1) dict) xs
+    in
+    aux D.empty list
 end
 
 module Count_tree = Count (Tree_dict)
@@ -561,3 +624,12 @@ let primer_count = Count_tree.count ["b"; "a"; "n"; "a"; "n"; "a"]
    b : 1
    n : 2
    val primer_count : unit = () *)
+
+(*
+ V praksi v OCamlu za slovarje uporabljamo modul `Map` (poglejte si
+ dokumentacijo). Slovar s ključi poljubnega tipa dobimo s funktorjem
+ `Map.Make`, ki mu podamo modul s tipom ključev in funkcijo `compare` za
+ njihovo primerjanje. Nekateri moduli, npr. `String`, ju že vsebujejo.
+*)
+
+module String_map = Map.Make (String)
